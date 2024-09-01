@@ -5,10 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuadRush</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-container {
+            width: 800px;
+            height: 600px;
+        }
+
+        .game-container canvas {
+            border: 1px solid black;
+        }
+    </style>
 </head>
 <body>
     <script src="src/vendor/excalibur-v0.29.3/excalibur.min.js"></script>
     <script src="src/index.js" type="module"></script>
+
+    <div class="game-container">
+        <canvas id="game"></canvas>
+    </div>
 
     <!-- Helpful resources -->
     <!-- https://github.com/excaliburjs/template-vanilla-js -->

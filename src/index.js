@@ -4,8 +4,11 @@ const resources = {
 };
 
 const game = new ex.Engine({
-    width: 800,
-    height: 600
+    canvasElementId: 'game',
+    antialiasing: false,
+    backgroundColor: ex.Color.White,
+    displayMode: ex.DisplayMode.FillContainer,
+    pointerScope: ex.Input.PointerScope.Document
 });
 
 // Resource loader
