@@ -20,7 +20,7 @@ const APIs = (pid) => ({
             sessionStorage.setItem('session_token', data.session_token);
             sessionStorage.setItem('player_id', data.player_id);
             localStorage.setItem('player_identifier', data.player_identifier);
-            console.log('LogInPlayer:', data);
+            console.debug('LogInPlayer:', data);
             return data;
         });
     },
@@ -38,7 +38,7 @@ const APIs = (pid) => ({
         .catch(error => console.error('Error:', error))
         .then(response => response.json())
         .then(data => {
-            console.log('SubmitScore:', data);
+            console.debug('SubmitScore:', data);
             return data;
         });
     },
@@ -54,7 +54,7 @@ const APIs = (pid) => ({
         .then(response => response.json())
         .then(data => {
             sessionStorage.setItem('high_score', data.score);
-            console.log('GetHighScore:', data);
+            console.debug('GetHighScore:', data);
             return data;
         });
     }
@@ -71,5 +71,9 @@ console.debug('Player ID:', player_identifier);
 
 // Export leaderboard APIs
 export const Leaderboard = APIs(player_identifier);
-await Leaderboard.LogInPlayer();
-await Leaderboard.GetHighScore();
+
+// Log in player and get high score
+Leaderboard.LogInPlayer()
+    .then(() => {
+        Leaderboard.GetHighScore();
+    });

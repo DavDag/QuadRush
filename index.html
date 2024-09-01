@@ -22,12 +22,28 @@
         }
 
         .game-container {
+            position: relative;
             width: 800px;
             height: 600px;
         }
 
         .game-container canvas {
             border: 1px solid black;
+        }
+
+        #game-over {
+            position: absolute;
+            display: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #start-game {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
     </style>
 </head>
@@ -37,6 +53,13 @@
 
     <div class="game-container">
         <canvas id="game"></canvas>
+
+        <div id="game-over">
+            <h1>Game Over</h1>
+            <p>Score: <span id="game-over-score">0</span></p>
+            <button onclick="window.PlayAgain();">Play Again</button>
+        </div>
+        <button id="start-game" onclick="window.StartGame();">Start Game</button>
     </div>
 
     <!-- Helpful resources -->
