@@ -8,28 +8,30 @@ for (res in Resources) {
     loader.addResource(Resources[res]);
 }
 
+// Physics
+ex.Physics.gravity = ex.vec(0, 800);
+
 // Game engine
 const game = new ex.Engine({
     canvasElementId: 'game',
     antialiasing: false,
     fixedUpdateFps: 60,
-    backgroundColor: ex.Color.White,
+    backgroundColor: ex.Color.fromHex('#5fcde4'),
     displayMode: ex.DisplayMode.FillContainer,
     pointerScope: ex.Input.PointerScope.Document
 });
 
 // Scenes
-game.add('game', GameScene);
+game.add('game', GameScene());
 const emptyscene = new ex.Scene();
 game.add('empty', emptyscene);
 game.goToScene('empty');
 
-// Physics
-ex.Physics.acc = new ex.Vector(0, 800);
-
 // Start the game
 game.start(loader).then(() => {
     console.debug('Engine started');
+
+    window.StartGame();
 });
 
 window.StartGame = () => {
@@ -54,5 +56,4 @@ window.PlayAgain = () => {
     game.goToScene('game');
 };
 
-// window.StartGame();
 // window.GameOver(128);
