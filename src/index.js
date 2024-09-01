@@ -1,3 +1,4 @@
+import { Leaderboard } from "./leaderboard.js";
 
 const resources = {
 
