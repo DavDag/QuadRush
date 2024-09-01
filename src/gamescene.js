@@ -1,7 +1,10 @@
-export const GameScene = () => {
+import { CreatePlayer } from "./player.js";
+
+export function CreateGameScene() {
     const scene = new ex.Scene();
 
     const lava = new ex.Actor({
+        name: 'lava',
         pos: new ex.Vector(400, 575),
         width: 800,
         height: 50,
@@ -9,18 +12,9 @@ export const GameScene = () => {
         collisionType: ex.CollisionType.Fixed,
     });
 
-    const player = new ex.Actor({
-        pos: new ex.Vector(400, 300),
-        width: 50,
-        height: 50,
-        color: ex.Color.Blue,
-        collisionType: ex.CollisionType.Active,
-        useGravity: true,
-    });
-
     scene.add(lava);
-    scene.add(player);
-
+    scene.add(CreatePlayer());
+    
     scene.camera.x = 400;
     scene.camera.y = 300;
 

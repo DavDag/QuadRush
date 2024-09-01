@@ -1,10 +1,10 @@
 import { Resources } from "./resources.js";
 import { Leaderboard } from "./leaderboard.js";
-import { GameScene } from "./gamescene.js";
+import { CreateGameScene } from "./gamescene.js";
 
 // Resource loader
 const loader = new ex.Loader();
-for (res in Resources) {
+for (const res in Resources) {
     loader.addResource(Resources[res]);
 }
 
@@ -21,24 +21,24 @@ const game = new ex.Engine({
     pointerScope: ex.Input.PointerScope.Document
 });
 
-// Scenes
-game.add('game', GameScene());
-const emptyscene = new ex.Scene();
-game.add('empty', emptyscene);
-game.goToScene('empty');
+// Empty scene
+const emptyScene = new ex.Scene();
+game.add("empty", emptyScene);
 
 // Start the game
 game.start(loader).then(() => {
     console.debug('Engine started');
 
     window.StartGame();
+    // window.GameOver(128);
 });
 
 window.StartGame = () => {
     document.getElementById('start-game').style.display = 'none';
 
     console.debug('Starting game');
-    game.goToScene('game');
+    game.add("game", CreateGameScene());
+    game.goToScene("game");
 };
 
 window.GameOver = (score) => {
@@ -46,14 +46,15 @@ window.GameOver = (score) => {
     document.getElementById('game-over-score').innerText = score;
 
     console.debug('Game over');
-    game.goToScene('empty');
+    game.goToScene("empty").then(() => {
+        game.removeScene("game");
+    });
 };
 
 window.PlayAgain = () => {
     document.getElementById('game-over').style.display = 'none';
 
     console.debug('Restarting game');
+    game.add("game", CreateGameScene());
     game.goToScene('game');
 };
-
-// window.GameOver(128);
