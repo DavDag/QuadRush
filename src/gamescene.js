@@ -1,7 +1,7 @@
 export const GameScene = () => {
     const scene = new ex.Scene();
 
-    const floor = new ex.Actor({
+    const lava = new ex.Actor({
         pos: new ex.Vector(400, 575),
         width: 800,
         height: 50,
@@ -18,7 +18,7 @@ export const GameScene = () => {
         useGravity: true,
     });
 
-    scene.add(floor);
+    scene.add(lava);
     scene.add(player);
 
     scene.camera.x = 400;
