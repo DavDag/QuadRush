@@ -1,5 +1,6 @@
 import { CreatePlatform, PLATFORM_PATTERNS } from "./platform.js";
 import { CreatePlayer } from "./player.js";
+import { Resources } from "./resources.js";
 
 export function CreateGameScene() {
     const scene = new ex.Scene();
@@ -11,6 +12,14 @@ export function CreateGameScene() {
         height: 50,
         color: ex.Color.Red,
         collisionType: ex.CollisionType.Fixed,
+        /* spriteSheet: ex.SpriteSheet.fromImageSource({
+            image: Resources.lava,
+            grid: {
+                rows: 1,
+                columns: 5
+            }
+        }), */
+
     });
 
     scene.add(lava);

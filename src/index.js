@@ -17,7 +17,7 @@ const game = new ex.Engine({
     antialiasing: false,
     fixedUpdateFps: 60,
     backgroundColor: ex.Color.fromHex('#5fcde4'),
-    displayMode: ex.DisplayMode.FillContainer,
+    displayMode: ex.DisplayMode.Fixed,
     pointerScope: ex.Input.PointerScope.Document
 });
 
