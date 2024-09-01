@@ -33,6 +33,7 @@ game.start(loader).then(() => {
     // window.GameOver(128);
 });
 
+// Test commit permissions
 window.StartGame = () => {
     document.getElementById('start-game').style.display = 'none';
 
