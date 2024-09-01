@@ -19,6 +19,7 @@ const APIs = (pid) => ({
         .then(data => {
             sessionStorage.setItem('session_token', data.session_token);
             sessionStorage.setItem('player_id', data.player_id);
+            localStorage.setItem('player_identifier', data.player_identifier);
             console.log('LogInPlayer:', data);
             return data;
         });
@@ -60,15 +61,15 @@ const APIs = (pid) => ({
 });
 
 // Get player ID from local storage (if any)
-const playerid = localStorage.getItem('playerid');
+const player_identifier = localStorage.getItem('player_identifier');
 
 // Save player ID to local storage
-localStorage.setItem('playerid', playerid);
+localStorage.setItem('player_identifier', player_identifier);
 
 // Log player ID to console (for debugging)
-console.debug('Player ID:', playerid);
+console.debug('Player ID:', player_identifier);
 
 // Export leaderboard APIs
-export const Leaderboard = APIs(playerid);
+export const Leaderboard = APIs(player_identifier);
 await Leaderboard.LogInPlayer();
 await Leaderboard.GetHighScore();
