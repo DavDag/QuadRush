@@ -9,6 +9,15 @@ export const PLATFORM_PATTERNS = {
             collisionType: ex.CollisionType.Fixed,
         },
     ],
+    "test": [
+        {
+            posoffset: new ex.Vector(0, 0),
+            width: 2000,
+            height: 50,
+            color: ex.Color.Yellow,
+            collisionType: ex.CollisionType.Fixed,
+        }
+    ],
     "start": [
         {
             posoffset: new ex.Vector(100, -100),

@@ -69,7 +69,7 @@ export function CreatePlayer(OnDie, OnWin) {
             player.onGround = false;
 
             // Play jump sound
-            Resources.jump.play(0.1);
+            Resources.jump.play(window.volume);
         }
 
         // Dash
@@ -79,7 +79,7 @@ export function CreatePlayer(OnDie, OnWin) {
             player.hasDash = false;
 
             // Play dash sound
-            Resources.dash.play(0.1);
+            Resources.dash.play(window.volume);
         }
     };
 
