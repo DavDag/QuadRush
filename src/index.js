@@ -17,7 +17,7 @@ const game = new ex.Engine({
     displayMode: ex.DisplayMode.Fixed,
     pointerScope: ex.Input.PointerScope.Document,
     physics: {
-        gravity: ex.vec(0, 800),
+        // gravity: ex.vec(0, 800),
     },
 });
 

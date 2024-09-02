@@ -11,18 +11,18 @@ export const PLATFORM_PATTERNS = {
     ],
     "start": [
         {
-            posoffset: new ex.Vector(150, -150),
-            width: 300,
-            height: 300,
+            posoffset: new ex.Vector(100, -100),
+            width: 200,
+            height: 200,
             color: ex.Color.fromHex('#00000020'),
             collisionType: ex.CollisionType.Passive,
         }
     ],
     "end": [
         {
-            posoffset: new ex.Vector(-150, -150),
-            width: 300,
-            height: 300,
+            posoffset: new ex.Vector(-100, -100),
+            width: 200,
+            height: 200,
             color: ex.Color.fromHex('#00000020'),
             collisionType: ex.CollisionType.Passive,
         }

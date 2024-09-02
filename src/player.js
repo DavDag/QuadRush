@@ -12,12 +12,13 @@ export function CreatePlayer(OnDie, OnWin) {
         collisionType: ex.CollisionType.Active,
     });
 
+    player.size = ex.vec(50, 50);
     player.hasWon = false;
     player.isDead = false;
     player.onGround = false;
     player.body.useGravity = false;
     
-    player.onPreUpdate = (engine) => {
+    player.onPreUpdate = (engine, delta) => {
         if (player.isDead || player.hasWon) return;
         player.vel.x = 0;
 
@@ -25,6 +26,9 @@ export function CreatePlayer(OnDie, OnWin) {
         if (player.vel.y > 0) {
             player.onGround = false;
         }
+
+        // Apply gravity
+        player.vel.y += 800 * delta / 1000.0;
     
         // Move left and right
         if(engine.input.keyboard.isHeld(ex.Input.Keys.Left)
@@ -61,7 +65,7 @@ export function CreatePlayer(OnDie, OnWin) {
     
     player.onPostCollisionResolve = (self, other, side, contact) => {
         if (player.isDead || player.hasWon) return;
-        console.debug('Player colliding with:', other.owner.name);
+        //console.debug('Player colliding with:', other.owner.name);
     
         // Check for collision with lava (losing condition)
         if (other.owner.name === 'lava') {

@@ -4,13 +4,13 @@ import { Resources } from "./resources.js";
 
 const WINDOW_WIDTH = 800;
 const WINDOW_HEIGHT = 600;
-const LEVEL_LENGTH = 1600;
+const LEVEL_LENGTH = 1000;
 const PLATFORM_HEIGHT = WINDOW_HEIGHT - 50;
 
 export function CreateGameScene() {
     const scene = new ex.Scene();
 
-    let playerPos = new ex.Vector(1200, WINDOW_HEIGHT / 2);
+    let playerPos = new ex.Vector(200, 400);
     let playerVel = ex.vec(0, 0);
 
     const OnDie = () => {
@@ -31,7 +31,7 @@ export function CreateGameScene() {
 
         // Position the camera right to rotate properly
         playerPos.x = WINDOW_HEIGHT - scene.player.pos.y;
-        playerPos.y = LEVEL_LENGTH - scene.player.pos.x;
+        playerPos.y = PLATFORM_HEIGHT - (LEVEL_LENGTH - scene.player.pos.x) + scene.player.size.y;
         playerVel.x = scene.player.vel.y;
         playerVel.y = scene.player.vel.x;
 
@@ -75,7 +75,7 @@ export function CreateGameScene() {
         name: 'lava',
         pos: new ex.Vector(-250, 0),
         width: 500,
-        height: LEVEL_LENGTH,
+        height: WINDOW_HEIGHT * 3,
         color: ex.Color.Red,
         collisionType: ex.CollisionType.Fixed,
     });
@@ -91,7 +91,7 @@ export function CreateGameScene() {
         name: 'lava',
         pos: new ex.Vector(LEVEL_LENGTH + 250, 0),
         width: 500,
-        height: LEVEL_LENGTH,
+        height: WINDOW_HEIGHT * 3,
         color: ex.Color.Red,
         collisionType: ex.CollisionType.Fixed,
     });
@@ -124,17 +124,19 @@ export function CreateGameScene() {
 
         // Platforms
         scene.platforms = [];
-        for (const p of CreatePlatforms(new ex.Vector(300, PLATFORM_HEIGHT), "base")) {
+        for (const p of CreatePlatforms(new ex.Vector(200, PLATFORM_HEIGHT), "base")) {
             scene.add(p);
             scene.platforms.push(p);
         }
-        for (const p of CreatePlatforms(new ex.Vector(700, PLATFORM_HEIGHT), "base")) {
+        for (const p of CreatePlatforms(new ex.Vector(LEVEL_LENGTH - 200, PLATFORM_HEIGHT), "base")) {
             scene.add(p);
             scene.platforms.push(p);
         }
-        for (const p of CreatePlatforms(new ex.Vector(1100, PLATFORM_HEIGHT), "base")) {
-            scene.add(p);
-            scene.platforms.push(p);
+        for (let x = 500; x < LEVEL_LENGTH - 300; x += 500) {
+            for (const p of CreatePlatforms(new ex.Vector(x, PLATFORM_HEIGHT), "base")) {
+                scene.add(p);
+                scene.platforms.push(p);
+            }
         }
 
         return () => {
