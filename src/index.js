@@ -15,7 +15,7 @@ for (const res in Resources) {
 const game = new ex.Engine({
     canvasElementId: 'game',
     antialiasing: false,
-    fixedUpdateFps: 30,
+    fixedUpdateFps: 60,
     backgroundColor: ex.Color.fromHex('#5fcde4'),
     displayMode: ex.DisplayMode.Fixed,
     pointerScope: ex.Input.PointerScope.Document,
@@ -80,6 +80,16 @@ window.ResumeGame = () => {
 
     // console.debug('Resuming game');
     game.start();
+};
+
+window.UpdateTimeLimitUI = (timelimit) => {
+    // Format time as MM:SS:MS
+    const minutes = Math.floor(timelimit / 60);
+    const seconds = Math.floor(timelimit % 60);
+    const milliseconds = Math.floor((timelimit % 1) * 100);
+
+    // Update time display
+    document.getElementById('timelimit').innerText = `${minutes}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
 };
 
 window.UpdateTimerUI = (time, close) => {
