@@ -3,23 +3,28 @@ export const PLATFORM_PATTERNS = {
     "base": [
         {
             posoffset: new ex.Vector(0, 0),
-            width: 400,
+            width: 300,
             height: 50,
             color: ex.Color.Gray,
+            collisionType: ex.CollisionType.Fixed,
         },
+    ],
+    "start": [
+        {
+            posoffset: new ex.Vector(150, -150),
+            width: 300,
+            height: 300,
+            color: ex.Color.fromHex('#00000020'),
+            collisionType: ex.CollisionType.Passive,
+        }
     ],
     "end": [
         {
-            posoffset: new ex.Vector(+25, -300),
-            width: 50,
-            height: 600,
-            color: ex.Color.Green,
-        },
-        {
-            posoffset: new ex.Vector(-100, 0),
-            width: 200,
-            height: 50,
-            color: ex.Color.Green,
+            posoffset: new ex.Vector(-150, -150),
+            width: 300,
+            height: 300,
+            color: ex.Color.fromHex('#00000020'),
+            collisionType: ex.CollisionType.Passive,
         }
     ],
 };
@@ -34,7 +39,7 @@ export function CreatePlatforms(pos, pattern) {
             width: data.width,
             height: data.height,
             color: data.color,
-            collisionType: ex.CollisionType.Fixed,
+            collisionType: data.collisionType,
         });
         platform.pattern = pattern;
         platforms.push(platform);

@@ -6,21 +6,25 @@ const JUMP_SPEED = 450;
 export function CreatePlayer(OnDie, OnWin) {
     const player = new ex.Actor({
         name: 'player',
-        pos: new ex.Vector(1200, 300),
         width: 50,
         height: 50,
         color: ex.Color.Blue,
         collisionType: ex.CollisionType.Active,
-        useGravity: true,
     });
 
     player.hasWon = false;
     player.isDead = false;
-    player.onGround = true;
+    player.onGround = false;
+    player.body.useGravity = false;
     
     player.onPreUpdate = (engine) => {
-        player.vel.x = 0;
         if (player.isDead || player.hasWon) return;
+        player.vel.x = 0;
+
+        // Remove jumping ability if player is falling
+        if (player.vel.y > 0) {
+            player.onGround = false;
+        }
     
         // Move left and right
         if(engine.input.keyboard.isHeld(ex.Input.Keys.Left)
@@ -43,10 +47,15 @@ export function CreatePlayer(OnDie, OnWin) {
             // Play jump sound
             Resources.jump.play(0.1);
         }
+    };
 
-        // Remove jumping ability if player is falling
-        if (player.vel.y > 0) {
-            player.onGround = false;
+    player.onCollisionStart = (self, other, side, contact) => {
+        // Check for collision with end platform (winning condition)
+        if (other.owner.name === 'platform' && other.owner.pattern === 'end') {
+            player.hasWon = true;
+            player.body.useGravity = false;
+            OnWin();
+            player.vel = ex.vec(0, 0);
         }
     };
     
@@ -57,13 +66,9 @@ export function CreatePlayer(OnDie, OnWin) {
         // Check for collision with lava (losing condition)
         if (other.owner.name === 'lava') {
             player.isDead = true;
+            player.body.useGravity = false;
             OnDie();
-        }
-
-        // Check for collision with end platform (winning condition)
-        if (other.owner.name === 'platform' && other.owner.pattern === 'end') {
-            player.hasWon = true;
-            OnWin();
+            player.vel = ex.vec(0, 0);
         }
     
         // Check for collision with ground (reset jumping ability)

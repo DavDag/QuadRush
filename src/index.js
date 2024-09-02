@@ -8,17 +8,17 @@ for (const res in Resources) {
     loader.addResource(Resources[res]);
 }
 
-// Physics
-ex.Physics.gravity = ex.vec(0, 800);
-
 // Game engine
 const game = new ex.Engine({
     canvasElementId: 'game',
     antialiasing: false,
-    fixedUpdateFps: 60,
+    fixedUpdateFps: 30,
     backgroundColor: ex.Color.fromHex('#5fcde4'),
     displayMode: ex.DisplayMode.Fixed,
-    pointerScope: ex.Input.PointerScope.Document
+    pointerScope: ex.Input.PointerScope.Document,
+    physics: {
+        gravity: ex.vec(0, 800),
+    },
 });
 
 // Empty scene

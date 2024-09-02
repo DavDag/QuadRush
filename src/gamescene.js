@@ -2,14 +2,22 @@ import { CreatePlatforms, PLATFORM_PATTERNS } from "./platform.js";
 import { CreatePlayer } from "./player.js";
 import { Resources } from "./resources.js";
 
+const WINDOW_WIDTH = 800;
+const WINDOW_HEIGHT = 600;
+const LEVEL_LENGTH = 1600;
+const PLATFORM_HEIGHT = WINDOW_HEIGHT - 50;
+
 export function CreateGameScene() {
     const scene = new ex.Scene();
+
+    let playerPos = new ex.Vector(1200, WINDOW_HEIGHT / 2);
+    let playerVel = ex.vec(0, 0);
 
     const OnDie = () => {
         console.debug('Player died');
 
         // Zoom in the camera over 1 second
-        scene.camera.clearAllStrategies();
+        // scene.camera.clearAllStrategies();
         scene.camera.zoomOverTime(2, 1000);
 
         // Wait 1 second then call GameOver
@@ -17,42 +25,87 @@ export function CreateGameScene() {
             window.GameOver(0);
         }, 1000);
     };
+
     const OnWin = () => {
         console.debug('Player won');
 
         // Position the camera right to rotate properly
-        scene.camera.clearAllStrategies();
-        scene.camera.pos = new ex.Vector(1200, 200);
+        playerPos.x = WINDOW_HEIGHT - scene.player.pos.y;
+        playerPos.y = LEVEL_LENGTH - scene.player.pos.x;
+        playerVel.x = scene.player.vel.y;
+        playerVel.y = scene.player.vel.x;
 
-        // Rotate the camera 90 degrees over 1 second
-        const int = setInterval(() => {
-            scene.camera.rotation += (Math.PI / 2) / 90;
-            if (scene.camera.rotation >= Math.PI / 2) {
-                clearInterval(int);
-                scene.camera.rotation = 0;
-                scene.clear();
-                fillLevel();
+        // Rotate the camera 45 degrees
+        const int1 = setInterval(() => {
+            for (const p of scene.platforms) {
+                p.color = new ex.Color(p.color.r, p.color.g, p.color.b, p.color.a - 1 / 100);
             }
-        }, 1000 / 90);
+            scene.camera.rotation += (Math.PI / 4) / 100;
+            if (scene.camera.rotation >= Math.PI / 4) {
+                clearInterval(int1);
+                const rot = scene.camera.rotation;
+                for (const p of scene.platforms) {
+                    p.kill();
+                }
+                scene.player.kill();
+                const startScene = fillLevel();
+                
+                // Rotate the camera 45 degrees
+                scene.camera.rotation = -rot;
+                for (const p of scene.platforms) {
+                    p.color = new ex.Color(p.color.r, p.color.g, p.color.b, 0);
+                }
+                const int2 = setInterval(() => {
+                    for (const p of scene.platforms) {
+                        p.color = new ex.Color(p.color.r, p.color.g, p.color.b, p.color.a + 1 / 100);
+                    }
+                    scene.camera.rotation += (Math.PI / 4) / 100;
+                    if (scene.camera.rotation >= 0) {
+                        clearInterval(int2);
+                        scene.camera.rotation = 0;
+                        startScene();
+                    }
+                }, 10);
+            }
+        }, 10);
     };
 
     // Lava
-    const lava = new ex.Actor({
+    const lavaL = new ex.Actor({
         name: 'lava',
-        pos: new ex.Vector(800, 575),
-        width: 1600,
-        height: 50,
+        pos: new ex.Vector(-250, 0),
+        width: 500,
+        height: LEVEL_LENGTH,
         color: ex.Color.Red,
         collisionType: ex.CollisionType.Fixed,
-        /* spriteSheet: ex.SpriteSheet.fromImageSource({
-            image: Resources.lava,
-            grid: {
-                rows: 1,
-                columns: 5
-            }
-        }), */
     });
-    scene.add(lava);
+    const lavaB = new ex.Actor({
+        name: 'lava',
+        pos: new ex.Vector(LEVEL_LENGTH / 2, WINDOW_HEIGHT + 250),
+        width: LEVEL_LENGTH,
+        height: 500,
+        color: ex.Color.Red,
+        collisionType: ex.CollisionType.Fixed,
+    });
+    const lavaR = new ex.Actor({
+        name: 'lava',
+        pos: new ex.Vector(LEVEL_LENGTH + 250, 0),
+        width: 500,
+        height: LEVEL_LENGTH,
+        color: ex.Color.Red,
+        collisionType: ex.CollisionType.Fixed,
+    });
+    scene.add(lavaL);
+    scene.add(lavaB);
+    scene.add(lavaR);
+
+    // Start and end platforms
+    for (const p of CreatePlatforms(new ex.Vector(0, WINDOW_HEIGHT), "start")) {
+        scene.add(p);
+    }
+    for (const p of CreatePlatforms(new ex.Vector(LEVEL_LENGTH, WINDOW_HEIGHT), "end")) {
+        scene.add(p);
+    }
 
     // Level
     scene.level = 0;
@@ -61,23 +114,35 @@ export function CreateGameScene() {
 
         // Player
         const player = CreatePlayer(OnDie, OnWin);
+        scene.player = player;
         scene.add(player);
+        player.pos = playerPos;
+        player.vel = playerVel;
+        scene.camera.pos = playerPos;
         scene.camera.clearAllStrategies();
         scene.camera.strategy.elasticToActor(player, 0.1, 0.1);
-        scene.camera.strategy.limitCameraBounds(new ex.BoundingBox(0, -1000, 1600, 600));
 
         // Platforms
-        for (const p of CreatePlatforms(new ex.Vector(500, 500), "base")) {
+        scene.platforms = [];
+        for (const p of CreatePlatforms(new ex.Vector(300, PLATFORM_HEIGHT), "base")) {
             scene.add(p);
+            scene.platforms.push(p);
         }
-        for (const p of CreatePlatforms(new ex.Vector(1000, 500), "base")) {
+        for (const p of CreatePlatforms(new ex.Vector(700, PLATFORM_HEIGHT), "base")) {
             scene.add(p);
+            scene.platforms.push(p);
         }
-        for (const p of CreatePlatforms(new ex.Vector(1600, 500), "end")) {
+        for (const p of CreatePlatforms(new ex.Vector(1100, PLATFORM_HEIGHT), "base")) {
             scene.add(p);
+            scene.platforms.push(p);
         }
+
+        return () => {
+            player.body.useGravity = true;
+        };
     };
-    fillLevel();
+    const startScene = fillLevel();
+    startScene();
 
     return scene;
 };
