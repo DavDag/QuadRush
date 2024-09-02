@@ -109,8 +109,9 @@ window.UpdateScoreUI = (score) => {
     document.getElementById('score').innerText = score;
 };
 
-window.UpdateHighscoreUI = (score) => {
+window.UpdateHighscoreUI = (score, rank) => {
     document.getElementById('high-score').innerText = score;
+    document.getElementById('rank').innerText = rank;
 };
 
 // Listen to ESC key

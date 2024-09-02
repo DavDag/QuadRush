@@ -77,8 +77,12 @@ export function CreateGameScene() {
         score += timerunning * (scene.level + 1);
         window.UpdateScoreUI(score);
         if (score > sessionStorage.getItem('high_score')) {
-            window.UpdateHighscoreUI(score);
-            Leaderboard.SubmitScore(score);
+            window.UpdateHighscoreUI(score, '?');
+            Leaderboard.SubmitScore(score)
+                .then(async () => {
+                    const res = await Leaderboard.GetHighScore();
+                    window.UpdateHighscoreUI(res.score, res.rank);
+                });
         }
 
         // Position the camera right to rotate properly

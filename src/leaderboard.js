@@ -75,5 +75,5 @@ export const Leaderboard = APIs(player_identifier);
 Leaderboard.LogInPlayer()
     .then(async () => {
         const res = await Leaderboard.GetHighScore();
-        window.UpdateHighscoreUI(res.score);
+        window.UpdateHighscoreUI(res.score, res.rank);
     });
