@@ -1,5 +1,7 @@
 import { Resources } from "./resources.js";
 
+const DASH_POWER = 2;
+const DASH_DURATION = 500;
 const SIDE_SPEED = 250;
 const JUMP_SPEED = 450;
 
@@ -16,11 +18,12 @@ export function CreatePlayer(OnDie, OnWin) {
     player.hasWon = false;
     player.isDead = false;
     player.onGround = false;
+    player.hasDash = false;
+    player.isDashing = 0;
     player.body.useGravity = false;
     
     player.onPreUpdate = (engine, delta) => {
         if (player.isDead || player.hasWon) return;
-        player.vel.x = 0;
 
         // Remove jumping ability if player is falling
         if (player.vel.y > 0) {
@@ -29,15 +32,32 @@ export function CreatePlayer(OnDie, OnWin) {
 
         // Apply gravity
         player.vel.y += 800 * delta / 1000.0;
+
+        // Reduce dash duration
+        if (player.isDashing > 0) {
+            player.isDashing -= delta;
+            if (player.isDashing <= 0) {
+                player.isDashing = 0;
+            }
+        }
     
         // Move left and right
         if(engine.input.keyboard.isHeld(ex.Input.Keys.Left)
             || engine.input.keyboard.isHeld(ex.Input.Keys.A)) {
-            player.vel.x = -SIDE_SPEED;
+            if (player.isDashing > 0 && player.vel.x > 0) {
+                player.isDashing = 0;
+            }
+            player.vel.x = -SIDE_SPEED * (player.isDashing > 0 ? DASH_POWER : 1);
         }
-        if(engine.input.keyboard.isHeld(ex.Input.Keys.Right)
+        else if(engine.input.keyboard.isHeld(ex.Input.Keys.Right)
             || engine.input.keyboard.isHeld(ex.Input.Keys.D)) {
-            player.vel.x = SIDE_SPEED;
+            if (player.isDashing > 0 && player.vel.x < 0) {
+                player.isDashing = 0;
+            }
+            player.vel.x = SIDE_SPEED * (player.isDashing > 0 ? DASH_POWER : 1);
+        }
+        else {
+            player.vel.x = 0;
         }
     
         // Jump
@@ -50,6 +70,16 @@ export function CreatePlayer(OnDie, OnWin) {
 
             // Play jump sound
             Resources.jump.play(0.1);
+        }
+
+        // Dash
+        if(engine.input.keyboard.isHeld(ex.Input.Keys.ShiftLeft)
+            && player.hasDash) {
+            player.isDashing = DASH_DURATION;
+            player.hasDash = false;
+
+            // Play dash sound
+            Resources.dash.play(0.1);
         }
     };
 
@@ -65,7 +95,6 @@ export function CreatePlayer(OnDie, OnWin) {
     
     player.onPostCollisionResolve = (self, other, side, contact) => {
         if (player.isDead || player.hasWon) return;
-        //console.debug('Player colliding with:', other.owner.name);
     
         // Check for collision with lava (losing condition)
         if (other.owner.name === 'lava') {
@@ -78,6 +107,9 @@ export function CreatePlayer(OnDie, OnWin) {
         // Check for collision with ground (reset jumping ability)
         if (side === ex.Side.Bottom) {
             player.onGround = true;
+            if (player.isDashing == 0) {
+                player.hasDash = true;
+            }
         }
     };
 

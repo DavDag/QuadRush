@@ -27,7 +27,7 @@ game.add("empty", emptyScene);
 
 // Start the game
 game.start(loader).then(() => {
-    console.debug('Engine started');
+    // console.debug('Engine started');
 
     window.StartGame();
     // window.GameOver(128);
@@ -36,7 +36,7 @@ game.start(loader).then(() => {
 window.StartGame = () => {
     document.getElementById('start-game').style.display = 'none';
 
-    console.debug('Starting game');
+    // console.debug('Starting game');
     game.add("game", CreateGameScene());
     game.goToScene("game");
 };
@@ -45,7 +45,7 @@ window.GameOver = (score) => {
     document.getElementById('game-over').style.display = 'block';
     document.getElementById('game-over-score').innerText = score;
 
-    console.debug('Game over');
+    // console.debug('Game over');
     game.goToScene("empty").then(() => {
         game.removeScene("game");
     });
@@ -54,7 +54,7 @@ window.GameOver = (score) => {
 window.PlayAgain = () => {
     document.getElementById('game-over').style.display = 'none';
 
-    console.debug('Restarting game');
+    // console.debug('Restarting game');
     game.add("game", CreateGameScene());
     game.goToScene('game');
 };

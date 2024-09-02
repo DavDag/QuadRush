@@ -4,7 +4,7 @@ import { Resources } from "./resources.js";
 
 const WINDOW_WIDTH = 800;
 const WINDOW_HEIGHT = 600;
-const LEVEL_LENGTH = 1000;
+const LEVEL_LENGTH = 4000;
 const PLATFORM_HEIGHT = WINDOW_HEIGHT - 50;
 
 export function CreateGameScene() {
@@ -14,11 +14,14 @@ export function CreateGameScene() {
     let playerVel = ex.vec(0, 0);
 
     const OnDie = () => {
-        console.debug('Player died');
+        // console.debug('Player died');
 
         // Zoom in the camera over 1 second
         // scene.camera.clearAllStrategies();
         scene.camera.zoomOverTime(2, 1000);
+
+        // Play death sound
+        Resources.death.play(0.2);
 
         // Wait 1 second then call GameOver
         setTimeout(() => {
@@ -27,7 +30,7 @@ export function CreateGameScene() {
     };
 
     const OnWin = () => {
-        console.debug('Player won');
+        // console.debug('Player won');
 
         // Position the camera right to rotate properly
         playerPos.x = WINDOW_HEIGHT - scene.player.pos.y;
@@ -132,12 +135,7 @@ export function CreateGameScene() {
             scene.add(p);
             scene.platforms.push(p);
         }
-        for (let x = 500; x < LEVEL_LENGTH - 300; x += 500) {
-            for (const p of CreatePlatforms(new ex.Vector(x, PLATFORM_HEIGHT), "base")) {
-                scene.add(p);
-                scene.platforms.push(p);
-            }
-        }
+
 
         return () => {
             player.body.useGravity = true;
