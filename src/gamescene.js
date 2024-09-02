@@ -162,7 +162,7 @@ export function CreateGameScene() {
     }
 
     // Level
-    scene.level = 10;
+    scene.level = 0;
     const fillLevel = () => {
         // Player
         const player = CreatePlayer(OnDie, OnWin);
@@ -185,7 +185,14 @@ export function CreateGameScene() {
             scene.platforms.push(p);
         }
         for (let i = 0; i < 4; i++) {
-            const type = "falling";
+            const types = [
+                "falling.1",
+                "falling.2",
+                "falling.2.inv",
+                "falling.3",
+                "falling.4"
+            ];
+            const type = types[Math.floor(Math.random() * types.length)];
             for (const p of CreatePlatforms(scene, scene.level, new ex.Vector(400 + 250 + 500 * i, PLATFORM_HEIGHT), type)) {
                 scene.add(p);
                 scene.platforms.push(p);

@@ -5,6 +5,7 @@ const resources = {
     dash: new ex.Sound('/src/assets/music/dash.wav'),
     death: new ex.Sound('/src/assets/music/death.wav'),
     danger: new ex.Sound('/src/assets/music/danger.wav'),
+    falling: new ex.Sound('/src/assets/music/falling.wav'),
     levelcomplete: new ex.Sound('/src/assets/music/levelcomplete.wav'),
 };
 

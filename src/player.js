@@ -25,11 +25,6 @@ export function CreatePlayer(OnDie, OnWin) {
     player.onPreUpdate = (engine, delta) => {
         if (player.isDead || player.hasWon || player.isPaused) return;
 
-        // Remove jumping ability if player is falling
-        if (player.vel.y > 0) {
-            player.onGround = false;
-        }
-
         // Apply gravity
         player.vel.y += 800 * delta / 1000.0;
 
