@@ -1,7 +1,7 @@
 import { Resources } from "./resources.js";
 
 export const PLATFORM_PATTERNS = {
-    "base": (level) => ([
+    "base": (_) => ([
         {
             posoffset: new ex.Vector(0, 0),
             width: 400,
