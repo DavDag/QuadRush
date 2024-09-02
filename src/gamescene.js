@@ -1,3 +1,4 @@
+import { Leaderboard } from "./leaderboard.js";
 import { CreatePlatforms, PLATFORM_PATTERNS } from "./platform.js";
 import { CreatePlayer } from "./player.js";
 import { Resources } from "./resources.js";
@@ -12,9 +13,41 @@ export function CreateGameScene() {
 
     let playerPos = new ex.Vector(200, 400);
     let playerVel = ex.vec(0, 0);
+    let wasClose = false;
+    let timerunning = 0;
+    let timelimit = 6;
+    let score = 0;
+
+    window.UpdateScoreUI(0);
+    window.UpdateTimerUI(0, false);
+
+    const scoretimer = new ex.Timer({
+        fcn: () => {
+            timerunning += 100;
+            const time = timerunning / 1000;
+            const close = time >= (timelimit * 0.75); // only 25% time left
+            window.UpdateTimerUI(time, close);
+
+            if (close && !wasClose) {
+                wasClose = true;
+                Resources.danger.play(window.volume);
+            }
+            if (time >= timelimit) {
+                scene.player.Die();
+                OnDie();
+            }
+        },
+        repeats: true,
+        interval: 100,
+    });
+    scene.add(scoretimer);
 
     const OnDie = () => {
         // console.debug('Player died');
+
+        // Stop the timer
+        scoretimer.stop();
+        scene.player.isPaused = true;
 
         // Zoom in the camera over 1 second
         // scene.camera.clearAllStrategies();
@@ -25,16 +58,32 @@ export function CreateGameScene() {
 
         // Wait 1 second then call GameOver
         setTimeout(() => {
-            window.GameOver(0);
+            window.GameOver(score);
         }, 1000);
     };
 
     const OnWin = () => {
         // console.debug('Player won');
 
+        // Stop the timer
+        scoretimer.stop();
+        scene.player.isPaused = true;
+
+        // Play win sound
+        Resources.levelcomplete.play(window.volume);
+
+        // Stop the timer
+        score += timerunning * scene.level;
+        window.UpdateScoreUI(score);
+        if (score > sessionStorage.getItem('high_score')) {
+            window.UpdateHighscoreUI(score);
+            Leaderboard.SubmitScore(score);
+        }
+
         // Position the camera right to rotate properly
         playerPos.x = WINDOW_HEIGHT - scene.player.pos.y;
         playerPos.y = PLATFORM_HEIGHT - (LEVEL_LENGTH - scene.player.pos.x) + scene.player.size.y;
+        scene.player.vel = ex.vec(0, 0);
         playerVel.x = scene.player.vel.y;
         playerVel.y = scene.player.vel.x;
 
@@ -135,13 +184,16 @@ export function CreateGameScene() {
             scene.add(p);
             scene.platforms.push(p);
         }
-        for (const p of CreatePlatforms(new ex.Vector(LEVEL_LENGTH / 2, PLATFORM_HEIGHT), "test")) {
-            scene.add(p);
-            scene.platforms.push(p);
-        }
+
+        // When testing
+        for (const p of CreatePlatforms(new ex.Vector(LEVEL_LENGTH / 2, PLATFORM_HEIGHT), "test")) { scene.add(p); scene.platforms.push(p); }
 
         return () => {
-            player.body.useGravity = true;
+            wasClose = false;
+            timerunning = 0;
+            player.isPaused = false;
+            scoretimer.reset();
+            scoretimer.start();
         };
     };
     const startScene = fillLevel();

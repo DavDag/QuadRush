@@ -53,7 +53,6 @@ const APIs = (pid) => ({
         .catch(error => console.error('Error:', error))
         .then(response => response.json())
         .then(data => {
-            sessionStorage.setItem('high_score', data.score);
             console.debug('GetHighScore:', data);
             return data;
         });
@@ -74,6 +73,7 @@ export const Leaderboard = APIs(player_identifier);
 
 // Log in player and get high score
 Leaderboard.LogInPlayer()
-    .then(() => {
-        Leaderboard.GetHighScore();
+    .then(async () => {
+        const res = await Leaderboard.GetHighScore();
+        window.UpdateHighscoreUI(res.score);
     });

@@ -17,13 +17,13 @@ export function CreatePlayer(OnDie, OnWin) {
     player.size = ex.vec(50, 50);
     player.hasWon = false;
     player.isDead = false;
+    player.isPaused = true;
     player.onGround = false;
     player.hasDash = false;
     player.isDashing = 0;
-    player.body.useGravity = false;
     
     player.onPreUpdate = (engine, delta) => {
-        if (player.isDead || player.hasWon) return;
+        if (player.isDead || player.hasWon || player.isPaused) return;
 
         // Remove jumping ability if player is falling
         if (player.vel.y > 0) {
@@ -84,24 +84,30 @@ export function CreatePlayer(OnDie, OnWin) {
     };
 
     player.onCollisionStart = (self, other, side, contact) => {
+        if (player.isDead || player.hasWon || player.isPaused) return;
+
         // Check for collision with end platform (winning condition)
         if (other.owner.name === 'platform' && other.owner.pattern === 'end') {
             player.hasWon = true;
-            player.body.useGravity = false;
+            player.isPaused = true;
             OnWin();
             player.vel = ex.vec(0, 0);
         }
     };
+
+    player.Die = () => {
+        player.isDead = true;
+        player.isPaused = true;
+        OnDie();
+        player.vel = ex.vec(0, 0);
+    };
     
     player.onPostCollisionResolve = (self, other, side, contact) => {
-        if (player.isDead || player.hasWon) return;
+        if (player.isDead || player.hasWon || player.isPaused) return;
     
         // Check for collision with lava (losing condition)
         if (other.owner.name === 'lava') {
-            player.isDead = true;
-            player.body.useGravity = false;
-            OnDie();
-            player.vel = ex.vec(0, 0);
+            player.Die();
         }
     
         // Check for collision with ground (reset jumping ability)

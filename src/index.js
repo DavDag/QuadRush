@@ -39,6 +39,8 @@ game.start(loader).then(() => {
 // Global functions
 
 window.StartGame = () => {
+    document.getElementById('ui-overlay').style.display = 'flex';
+
     // console.debug('Starting game');
     game.add("game", CreateGameScene());
     game.goToScene("game");
@@ -46,6 +48,7 @@ window.StartGame = () => {
 
 window.GameOver = (score) => {
     document.getElementById('game-over').style.display = 'flex';
+    document.getElementById('ui-overlay').style.display = 'none';
     document.getElementById('game-over-score').innerText = score;
 
     // console.debug('Game over');
@@ -56,10 +59,48 @@ window.GameOver = (score) => {
 
 window.PlayAgain = () => {
     document.getElementById('game-over').style.display = 'none';
+    document.getElementById('ui-overlay').style.display = 'flex';
 
     // console.debug('Restarting game');
     game.add("game", CreateGameScene());
     game.goToScene('game');
+};
+
+window.PauseGame = () => {
+    document.getElementById('pause-overlay').style.display = 'flex';
+    document.getElementById('ui-overlay').style.display = 'none';
+
+    // console.debug('Pausing game');
+    game.stop();
+};
+
+window.ResumeGame = () => {
+    document.getElementById('pause-overlay').style.display = 'none';
+    document.getElementById('ui-overlay').style.display = 'flex';
+
+    // console.debug('Resuming game');
+    game.start();
+};
+
+window.UpdateTimerUI = (time, close) => {
+    // Format time as MM:SS:MS
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    const milliseconds = Math.floor((time % 1) * 100);
+
+    // Update time display
+    document.getElementById('time').innerText = `${minutes}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
+
+    // Add 'close' class if time is close to limit
+    document.getElementById('time').classList.toggle('close', close);
+};
+
+window.UpdateScoreUI = (score) => {
+    document.getElementById('score').innerText = score;
+};
+
+window.UpdateHighscoreUI = (score) => {
+    document.getElementById('high-score').innerText = score;
 };
 
 // Listen to ESC key
@@ -68,17 +109,3 @@ game.input.keyboard.on('down', (evt) => {
         window.PauseGame();
     }
 });
-
-window.PauseGame = () => {
-    document.getElementById('pause-overlay').style.display = 'flex';
-
-    // console.debug('Pausing game');
-    game.stop();
-};
-
-window.ResumeGame = () => {
-    document.getElementById('pause-overlay').style.display = 'none';
-
-    // console.debug('Resuming game');
-    game.start();
-};

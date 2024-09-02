@@ -13,6 +13,7 @@
             overflow: hidden;
             width: 100%;
             height: 100%;
+            font-family: Arial, sans-serif;
         }
 
         body {
@@ -32,7 +33,7 @@
             height: 100%;
         }
 
-        .game-overlay {
+        .game-menu-overlay {
             position: absolute;
             display: none;
             flex-direction: column;
@@ -46,6 +47,36 @@
 
             backdrop-filter: blur(5px);
         }
+
+        .game-overlay {
+            position: absolute;
+            display: none;
+            flex-direction: row;
+            width: 100%;
+            top: 0;
+            right: 0;
+        }
+
+        .game-overlay div {
+            display: flex;
+            flex-grow: 1;
+            padding: 10px;
+            margin: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 5px;
+        }
+
+        .game-overlay div span {
+            font-weight: bold;
+            flex-grow: 1;
+            text-align: right;
+        }
+        
+
+        .close {
+            color: tomato;
+        }
     </style>
 </head>
 <body>
@@ -55,13 +86,19 @@
     <div class="game-container">
         <canvas id="game"></canvas>
 
-        <div id="game-over" class="game-overlay">
+        <div id="ui-overlay" class="game-overlay">
+            <div>HighScore<span id="high-score">0</span></div>
+            <div>Score<span id="score">0</span></div>
+            <div>Time<span id="time">0</span></div>
+        </div>
+
+        <div id="game-over" class="game-menu-overlay">
             <h1>Game Over</h1>
             <p>Score: <span id="game-over-score">0</span></p>
             <button onclick="window.PlayAgain();">Play Again</button>
         </div>
 
-        <div id="pause-overlay" class="game-overlay">
+        <div id="pause-overlay" class="game-menu-overlay">
             <h1>Pause</h1>
             <button onclick="window.ResumeGame();">Resume</button>
         </div>
