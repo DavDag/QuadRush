@@ -6,6 +6,9 @@
   "scripts": {
     "start:dev": "http-server . -o"
   },
+  "engines": {
+    "node": "20.*.*"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
