@@ -1,55 +1,51 @@
-import { Resources } from "./resources.js";
-import { Leaderboard } from "./leaderboard.js";
-import { CreateGameScene } from "./gamescene.js";
+import {Color, DisplayMode, Engine, Keys, Loader, Scene} from "excalibur";
+import {Resources} from "./resources";
+import {CreateGameScene} from "./gamescene";
 
 // Global settings
-window.volume = 0.5;
+window["volume"] = 0.5;
 
 // Resource loader
-const loader = new ex.Loader();
+const loader = new Loader();
 for (const res in Resources) {
     loader.addResource(Resources[res]);
 }
 
 // Game engine
-const game = new ex.Engine({
+const game = new Engine({
     canvasElementId: 'game',
     antialiasing: false,
     fixedUpdateFps: 60,
-    backgroundColor: ex.Color.fromHex('#5fcde4'),
-    displayMode: ex.DisplayMode.Fixed,
-    pointerScope: ex.Input.PointerScope.Document,
-    physics: {
-        // gravity: ex.vec(0, 800),
-    },
+    backgroundColor: Color.fromHex('#5fcde4'),
+    displayMode: DisplayMode.Fixed,
 });
 
 // Empty scene
-const emptyScene = new ex.Scene();
+const emptyScene = new Scene();
 game.add("empty", emptyScene);
 
 // Start the game
 game.start(loader).then(() => {
     // console.debug('Engine started');
 
-    window.StartGame();
+    window["StartGame"]();
     // window.GameOver(128);
 });
 
 // Global functions
 
-window.StartGame = () => {
+window["StartGame"] = () => {
     document.getElementById('ui-overlay').style.display = 'flex';
 
     // console.debug('Starting game');
     game.add("game", CreateGameScene());
-    game.goToScene("game");
+    void game.goToScene("game");
 };
 
-window.GameOver = (score) => {
+window["GameOver"] = (score: number) => {
     document.getElementById('game-over').style.display = 'flex';
     document.getElementById('ui-overlay').style.display = 'none';
-    document.getElementById('game-over-score').innerText = score;
+    document.getElementById('game-over-score').innerText = score.toString();
 
     // console.debug('Game over');
     game.goToScene("empty").then(() => {
@@ -57,16 +53,16 @@ window.GameOver = (score) => {
     });
 };
 
-window.PlayAgain = () => {
+window["PlayAgain"] = () => {
     document.getElementById('game-over').style.display = 'none';
     document.getElementById('ui-overlay').style.display = 'flex';
 
     // console.debug('Restarting game');
     game.add("game", CreateGameScene());
-    game.goToScene('game');
+    void game.goToScene('game');
 };
 
-window.PauseGame = () => {
+window["PauseGame"] = () => {
     document.getElementById('pause-overlay').style.display = 'flex';
     document.getElementById('ui-overlay').style.display = 'none';
 
@@ -74,15 +70,15 @@ window.PauseGame = () => {
     game.stop();
 };
 
-window.ResumeGame = () => {
+window["ResumeGame"] = () => {
     document.getElementById('pause-overlay').style.display = 'none';
     document.getElementById('ui-overlay').style.display = 'flex';
 
     // console.debug('Resuming game');
-    game.start();
+    void game.start();
 };
 
-window.UpdateTimeLimitUI = (timelimit) => {
+window["UpdateTimeLimitUI"] = (timelimit: number) => {
     // Format time as MM:SS:MS
     const minutes = Math.floor(timelimit / 60);
     const seconds = Math.floor(timelimit % 60);
@@ -92,7 +88,7 @@ window.UpdateTimeLimitUI = (timelimit) => {
     document.getElementById('timelimit').innerText = `${minutes}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
 };
 
-window.UpdateTimerUI = (time, close) => {
+window["UpdateTimerUI"] = (time: number, close: boolean) => {
     // Format time as MM:SS:MS
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
@@ -105,18 +101,18 @@ window.UpdateTimerUI = (time, close) => {
     document.getElementById('time').classList.toggle('close', close);
 };
 
-window.UpdateScoreUI = (score) => {
-    document.getElementById('score').innerText = score;
+window["UpdateScoreUI"] = (score: number) => {
+    document.getElementById('score').innerText = score.toString();
 };
 
-window.UpdateHighscoreUI = (score, rank) => {
-    document.getElementById('high-score').innerText = score;
-    document.getElementById('rank').innerText = rank;
+window["UpdateHighscoreUI"] = (score: number, rank: number) => {
+    document.getElementById('high-score').innerText = score.toString();
+    document.getElementById('rank').innerText = rank.toString();
 };
 
 // Listen to ESC key
-game.input.keyboard.on('down', (evt) => {
-    if (evt.key === ex.Input.Keys.Escape) {
-        window.PauseGame();
+game.input.keyboard.on('down', (evt: any) => {
+    if (evt.key === Keys.Escape) {
+        window["PauseGame"]();
     }
 });

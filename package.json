@@ -2,18 +2,18 @@
   "name": "quadrush",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "start:dev": "http-server . -o"
+    "start": "parcel serve src/index.html",
+    "build": "parcel build src/index.html --dist-dir ./dist --public-url ./"
   },
-  "engines": {
-    "node": "20.*.*"
-  },
-  "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "excalibur": "^0.29.3",
+    "typescript": "^5.5.4"
+  },
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "@types/node": "^22.5.2",
+    "parcel": "^2.12.0"
   }
 }

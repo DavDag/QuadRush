@@ -1,7 +1,7 @@
 const token = 'dev_7c18eecf877e40839a54bc7dc74ce363'; // Game key from LootLocker.io
 
 // Leaderboard APIs
-const APIs = (pid) => ({
+const APIs = (pid: string) => ({
     LogInPlayer: async () => {
         return await fetch('https://api.lootlocker.io/game/v2/session/guest', {
             method: 'POST',
@@ -14,7 +14,6 @@ const APIs = (pid) => ({
                 player_identifier: pid
             })
         })
-        .catch(error => console.error('Error:', error))
         .then(response => response.json())
         .then(data => {
             sessionStorage.setItem('session_token', data.session_token);
@@ -24,7 +23,7 @@ const APIs = (pid) => ({
             return data;
         });
     },
-    SubmitScore: async (score) => {
+    SubmitScore: async (score: number) => {
         return await fetch('https://api.lootlocker.io/game/leaderboards/24364/submit', {
             method: 'POST',
             headers: {
@@ -35,7 +34,6 @@ const APIs = (pid) => ({
                 score: score
             })
         })
-        .catch(error => console.error('Error:', error))
         .then(response => response.json())
         .then(data => {
             console.debug('SubmitScore:', data);
@@ -50,7 +48,6 @@ const APIs = (pid) => ({
                 'x-session-token': sessionStorage.getItem('session_token')
             },
         })
-        .catch(error => console.error('Error:', error))
         .then(response => response.json())
         .then(data => {
             console.debug('GetHighScore:', data);
@@ -73,7 +70,8 @@ export const Leaderboard = APIs(player_identifier);
 
 // Log in player and get high score
 Leaderboard.LogInPlayer()
-    .then(async () => {
-        const res = await Leaderboard.GetHighScore();
-        window.UpdateHighscoreUI(res.score, res.rank);
+    .then(() => {
+        Leaderboard.GetHighScore().then(res => {
+            window["UpdateHighscoreUI"](res.score, res.rank);
+        });
     });
