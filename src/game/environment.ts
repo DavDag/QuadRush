@@ -48,5 +48,8 @@ export class Environment {
     }
 
     public animateGoingToNextLevel(time: number) {
+        for (const a of [this.lavaL, this.lavaB, this.lavaR]) {
+            // TODO: Implement animation
+        }
     }
 }

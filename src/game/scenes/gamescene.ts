@@ -2,7 +2,7 @@ import {Leaderboard} from "../../api/leaderboard";
 import {CreatePlatforms} from "../platform";
 import {Player} from "../player";
 import {Resources} from "../resources";
-import {Action, Actor, Color, Engine, Fade, Scene, Timer, Vector} from "excalibur";
+import {Actor, Engine, Scene, Timer, Vector} from "excalibur";
 import {Config} from "../../config";
 import {Ui} from "../../ui";
 import {Environment} from "../environment";
@@ -14,7 +14,7 @@ export class GameScene extends Scene {
     private score = 0;
     private level = 0;
 
-    private playerPos = new Vector(2500, 400);
+    private playerPos = new Vector(200, 400);
     private playerVel = new Vector(0, 0);
     private wasClose = false;
     private timerunning = 0;
