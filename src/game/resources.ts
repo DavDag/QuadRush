@@ -1,16 +1,16 @@
 import {Sound} from "excalibur";
 // @ts-ignore
-import JumpSound from "./assets/music/jump.mp3";
+import JumpSound from "../assets/music/jump.mp3";
 // @ts-ignore
-import DashSound from "./assets/music/dash.wav";
+import DashSound from "../assets/music/dash.wav";
 // @ts-ignore
-import DeathSound from "./assets/music/death.wav";
+import DeathSound from "../assets/music/death.wav";
 // @ts-ignore
-import DangerSound from "./assets/music/danger.wav";
+import DangerSound from "../assets/music/danger.wav";
 // @ts-ignore
-import FallingSound from "./assets/music/falling.wav";
+import FallingSound from "../assets/music/falling.wav";
 // @ts-ignore
-import LevelCompleteSound from "./assets/music/levelcomplete.wav";
+import LevelCompleteSound from "../assets/music/levelcomplete.wav";
 
 const resources = {
     jump: new Sound(JumpSound),

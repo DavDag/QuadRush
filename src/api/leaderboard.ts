@@ -1,3 +1,5 @@
+import {Ui} from "../ui";
+
 const token = 'dev_7c18eecf877e40839a54bc7dc74ce363'; // Game key from LootLocker.io
 
 // Leaderboard APIs
@@ -72,6 +74,6 @@ export const Leaderboard = APIs(player_identifier);
 Leaderboard.LogInPlayer()
     .then(() => {
         Leaderboard.GetHighScore().then(res => {
-            window["UpdateHighscoreUI"](res.score, res.rank);
+            Ui.UpdateHighScore(res.score, res.rank);
         });
     });
