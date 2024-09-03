@@ -17,7 +17,7 @@ Submission to the _ScoreSpam GameJam #31_.
 
 ## Gameplay
 
-a video will be here :)
+https://github.com/user-attachments/assets/51943e4d-cbec-40f1-980d-074badd1c41b
 
 ## Score equation
 
