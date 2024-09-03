@@ -2,7 +2,7 @@ import {Leaderboard} from "../../api/leaderboard";
 import {CreatePlatforms} from "../platform";
 import {Player} from "../player";
 import {Resources} from "../resources";
-import {Actor, Color, Engine, Scene, Timer, Vector} from "excalibur";
+import {Action, Actor, Color, Engine, Fade, Scene, Timer, Vector} from "excalibur";
 import {Config} from "../../config";
 import {Ui} from "../../ui";
 import {Environment} from "../environment";
@@ -14,7 +14,7 @@ export class GameScene extends Scene {
     private score = 0;
     private level = 0;
 
-    private playerPos = new Vector(200, 400);
+    private playerPos = new Vector(2500, 400);
     private playerVel = new Vector(0, 0);
     private wasClose = false;
     private timerunning = 0;
@@ -104,14 +104,12 @@ export class GameScene extends Scene {
 
         const timer2 = new Timer({
             fcn: () => {
-                for (const p of this.platforms) {
-                    p.color = new Color(p.color.r, p.color.g, p.color.b, p.color.a + 1 / 100);
-                }
                 this.camera.rotation += (Math.PI / 4) / 100;
                 if (this.camera.rotation >= 0) {
+                    timer2.stop();
+
                     this.camera.rotation = 0;
                     this.startScene();
-                    timer2.stop();
                 }
             },
             repeats: true,
@@ -120,11 +118,10 @@ export class GameScene extends Scene {
 
         const timer = new Timer({
             fcn: () => {
-                for (const p of this.platforms) {
-                    p.color = new Color(p.color.r, p.color.g, p.color.b, p.color.a - 1 / 100);
-                }
                 this.camera.rotation += (Math.PI / 4) / 100;
                 if (this.camera.rotation >= Math.PI / 4) {
+                    timer.stop();
+
                     const rot = this.camera.rotation;
                     for (const p of this.platforms) {
                         p.kill();
@@ -135,10 +132,13 @@ export class GameScene extends Scene {
 
                     this.camera.rotation = -rot;
                     for (const p of this.platforms) {
-                        p.color = new Color(p.color.r, p.color.g, p.color.b, 0);
+                        p.graphics.opacity = 0;
                     }
                     timer2.start();
-                    timer.stop();
+
+                    for (const p of this.platforms) {
+                        p.actions.fade(1, 1000);
+                    }
                 }
             },
             repeats: true,
@@ -148,6 +148,11 @@ export class GameScene extends Scene {
         this.add(timer);
         this.add(timer2);
         timer.start();
+        for (const p of this.platforms) {
+            p.actions.fade(0, 1000);
+        }
+
+        this.environment.animateGoingToNextLevel(1000 * 2);
     };
 
     private fillLevel() {
