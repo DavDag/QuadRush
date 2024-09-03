@@ -22,10 +22,16 @@ const game = new Engine({
 // Scenes
 game.add("empty", new EmptyScene());
 
-// Listen to ESC key
+// Listen to global events
 game.input.keyboard.on('down', (evt: any) => {
+    // Escape to pause the game
     if (evt.key === Keys.Escape) {
         window["PauseGame"]();
+    }
+
+    // P to toggle debug mode
+    if (evt.key === Keys.P) {
+        game.toggleDebug();
     }
 });
 

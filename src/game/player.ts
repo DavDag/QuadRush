@@ -1,5 +1,16 @@
 import {Resources} from "./resources";
-import {Actor, Collider, CollisionContact, CollisionType, Color, Engine, Keys, Side, Vector} from "excalibur";
+import {
+    Actor,
+    Collider,
+    CollisionContact,
+    CollisionType,
+    Color,
+    Engine,
+    GraphicsGroup,
+    Keys, Rectangle, Shape,
+    Side,
+    Vector
+} from "excalibur";
 import {Config} from "../config";
 
 export class Player extends Actor {
@@ -16,9 +27,51 @@ export class Player extends Actor {
             name: 'player',
             width: 50,
             height: 50,
-            color: Color.Blue,
-            collisionType: CollisionType.Active
+            color: Color.White,
+            collisionType: CollisionType.Active,
+            collider: Shape.Box(50, 50),
         });
+    }
+
+    onInitialize(engine: Engine) {
+        super.onInitialize(engine);
+
+        const current = this.graphics.current;
+        const shadow = current.clone();
+        shadow.tint = Color.Black;
+        const group = new GraphicsGroup({
+            members: [
+                {
+                    graphic: shadow,
+                    offset: new Vector(-25 + Config.shadowOffsetX, -25 + Config.shadowOffsetY)
+                },
+                {
+                    graphic: new Rectangle({
+                        color: Color.Black,
+                        width: 4,
+                        height: Config.windowHeight
+                    }),
+                    offset: new Vector(-25 + 25 - 2 + Config.shadowOffsetX, -25 + 50 + Config.shadowOffsetY),
+                },
+                {
+                    graphic: new Rectangle({
+                        color: Color.White,
+                        width: 4,
+                        height: Config.windowHeight
+                    }),
+                    offset: new Vector(-25 + 25 - 2, -25 + 50),
+                },
+                {
+                    graphic: current,
+                    offset: new Vector(-25, -25),
+                },
+            ],
+            useAnchor: false,
+            origin: new Vector(-25, -25),
+        });
+        this.graphics.use(group);
+
+        this.transform.z = Config.level1zIndex;
     }
 
     onPreUpdate(engine: Engine, delta: number) {

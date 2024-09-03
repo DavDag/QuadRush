@@ -11,4 +11,11 @@ export const Config = {
     dashPower: 2,
     dashDuration: 500,
     gravity: 800,
+
+    shadowOffsetX: -3,
+    shadowOffsetY: -3,
+
+    level1zIndex: 1,
+    level2zIndex: 3,
+    level3zIndex: 5,
 };

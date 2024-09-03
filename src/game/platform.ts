@@ -1,5 +1,6 @@
 import {Resources} from "./resources";
-import {Actor, CollisionType, Color, Scene, Timer, Vector} from "excalibur";
+import {Actor, CollisionType, Color, GraphicsGroup, Scene, Timer, Vector} from "excalibur";
+import {Config} from "../config";
 
 type PGenFun = (level: number) => {
     posoffset: Vector,
@@ -9,6 +10,7 @@ type PGenFun = (level: number) => {
     collisionType: CollisionType,
     willvanish?: boolean,
     movingy?: [number, number, number],
+    hasShadow?: boolean,
 }[];
 
 export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
@@ -19,6 +21,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             height: 50,
             color: Color.Gray,
             collisionType: CollisionType.Fixed,
+            hasShadow: true,
         },
     ]),
     "falling.1": (level: number) => ([
@@ -29,6 +32,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
+            hasShadow: true,
         },
     ]),
     "falling.2": (level: number) => ([
@@ -40,6 +44,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
             movingy: [0, -100, Math.max(500, 3000 - level * 500)],
+            hasShadow: true,
         },
         {
             posoffset: new Vector(+125, -100),
@@ -49,6 +54,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
             movingy: [0, 100, Math.max(500, 3000 - level * 500)],
+            hasShadow: true,
         },
     ]),
     "falling.2.inv": (level: number) => ([
@@ -60,6 +66,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
             movingy: [0, 100, Math.max(500, 3000 - level * 500)],
+            hasShadow: true,
         },
         {
             posoffset: new Vector(+125, 0),
@@ -69,6 +76,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
             movingy: [0, -100, Math.max(500, 3000 - level * 500)],
+            hasShadow: true,
         },
     ]),
     "falling.3": (level: number) => ([
@@ -79,6 +87,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
+            hasShadow: true,
         },
         {
             posoffset: new Vector(0, -75),
@@ -87,6 +96,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
+            hasShadow: true,
         },
         {
             posoffset: new Vector(125, 0),
@@ -95,6 +105,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
+            hasShadow: true,
         },
     ]),
     "falling.4": (level: number) => ([
@@ -105,6 +116,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
+            hasShadow: true,
         },
         {
             posoffset: new Vector(0, 25),
@@ -113,6 +125,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
+            hasShadow: true,
         },
     ]),
     "test": (_: number) => ([
@@ -122,6 +135,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PGenFun } = {
             height: 50,
             color: Color.Yellow,
             collisionType: CollisionType.Fixed,
+            hasShadow: true,
         }
     ]),
     "start": (_: number) => ([
@@ -194,6 +208,24 @@ export function CreatePlatforms(scene: Scene, level: number, pos: Vector, patter
             };
         }
         platforms.push(platform);
+
+        if (data.hasShadow === true) {
+            const shadow = platform.graphics.current.clone();
+            shadow.tint = Color.Black;
+            platform.graphics.use(new GraphicsGroup({
+                members: [
+                    {
+                        graphic: shadow,
+                        offset: new Vector(Config.shadowOffsetX, Config.shadowOffsetY),
+                    },
+                    {
+                        graphic: platform.graphics.current,
+                        offset: Vector.Zero
+                    }
+                ],
+            }));
+        }
+        platform.transform.z = Config.level2zIndex;
     }
     return platforms;
 }
