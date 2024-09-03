@@ -4,7 +4,7 @@ export const Config = {
     windowWidth: 800,
     windowHeight: 600,
     levelLength: 2800,
-    platformHeight: 550,
+    platformHeight: -50,
 
     sideSpeed: 200,
     jumpSpeed: 450,

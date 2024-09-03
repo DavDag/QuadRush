@@ -1,4 +1,4 @@
-import {Actor, CollisionType, Color, Scene, Timer, Vector} from "excalibur";
+import {Actor, CollisionType, Color, Scene, Vector} from "excalibur";
 import {Config} from "../config";
 import {CreatePlatforms} from "./platform";
 
@@ -20,7 +20,7 @@ export class Environment {
         });
         this.lavaB = new Actor({
             name: 'lava',
-            pos: new Vector(Config.levelLength / 2, Config.windowHeight + 250),
+            pos: new Vector(Config.levelLength / 2, 250),
             width: Config.levelLength,
             height: 500,
             color: Color.Red,
@@ -39,10 +39,10 @@ export class Environment {
         scene.add(this.lavaR);
 
         // Start and end platforms
-        for (const p of CreatePlatforms(scene, 0, new Vector(0, Config.windowHeight), "start")) {
+        for (const p of CreatePlatforms(scene, 0, new Vector(0, 0), "start")) {
             scene.add(p);
         }
-        for (const p of CreatePlatforms(scene, 0, new Vector(Config.levelLength, Config.windowHeight), "end")) {
+        for (const p of CreatePlatforms(scene, 0, new Vector(Config.levelLength, 0), "end")) {
             scene.add(p);
         }
     }

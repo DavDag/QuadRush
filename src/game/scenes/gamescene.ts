@@ -14,7 +14,7 @@ export class GameScene extends Scene {
     private score = 0;
     private level = 0;
 
-    private playerPos = new Vector(200, 400);
+    private playerPos = new Vector(200, Config.platformHeight - 200);
     private playerVel = new Vector(0, 0);
     private wasClose = false;
     private timerunning = 0;
@@ -98,7 +98,7 @@ export class GameScene extends Scene {
             });
 
         // Position the camera right to rotate properly
-        this.playerPos.x = Config.windowHeight - this.player.pos.y;
+        this.playerPos.x = -this.player.pos.y;
         this.playerPos.y = Config.platformHeight - (Config.levelLength - this.player.pos.x) + this.player.height;
         this.player.vel = new Vector(0, 0);
 
