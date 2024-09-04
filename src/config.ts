@@ -21,7 +21,7 @@ export const Config = {
 
     // Game: Feedback
     TimeThresholdForClose: 0.75,
-    LevelChangeDuration: 2000,
+    LevelChangeDuration: 1500,
     LevelChangeAnimInterval: 10,
     PlatformHidingAngle: Math.PI / 2,
     PlatformFallingSpeed: 500,
@@ -56,6 +56,16 @@ export const Config = {
     // Graphics: Platforms
     PlatformRotationHeight: 1800,
     PlatformZIndexes: [0, 2, 4],
+    PlatformColors: {
+        "base": Color.DarkGray,
+        "falling.1": Color.LightGray,
+        "falling.2": Color.Orange,
+        "falling.2.inv": Color.Orange,
+        "falling.3": Color.LightGray,
+        "falling.4": Color.LightGray,
+        "start": Color.fromHex("#00000020"),
+        "end": Color.fromHex("#00000020"),
+    },
 
     // Graphics: Player
     PlayerZIndex: 2,

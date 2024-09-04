@@ -18,7 +18,6 @@ interface PlatformUnitGenOptions {
     posoffset: Vector,
     width: number,
     height: number,
-    color: Color,
     collisionType: CollisionType,
     willvanish?: boolean,
     moving?: {
@@ -34,7 +33,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(0, 0),
             width: 400,
             height: 50,
-            color: Color.Gray,
             collisionType: CollisionType.Fixed,
         },
     ]),
@@ -43,7 +41,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(0, 0),
             width: Math.max(50, 500 - level * 50),
             height: 50,
-            color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
         },
@@ -53,7 +50,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(-125, 0),
             width: Math.max(50, 250 - level * 50),
             height: 50,
-            color: Color.Vermilion,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
             moving: {
@@ -66,7 +62,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(+125, -100),
             width: Math.max(50, 250 - level * 50),
             height: 50,
-            color: Color.Vermilion,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
             moving: {
@@ -81,7 +76,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(-125, -100),
             width: Math.max(50, 250 - level * 50),
             height: 50,
-            color: Color.Vermilion,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
             moving: {
@@ -94,7 +88,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(+125, 0),
             width: Math.max(50, 250 - level * 50),
             height: 50,
-            color: Color.Vermilion,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
             moving: {
@@ -109,7 +102,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(-125, 0),
             width: Math.max(25, 200 - level * 50),
             height: 50,
-            color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
         },
@@ -117,7 +109,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(0, -75),
             width: 50,
             height: Math.min(150, 25 + level * 50),
-            color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
         },
@@ -125,7 +116,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(125, 0),
             width: Math.max(25, 200 - level * 50),
             height: 50,
-            color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
         },
@@ -135,7 +125,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(0, -200),
             width: Math.max(50, 250 - level * 50),
             height: Math.min(150, 25 + level * 50),
-            color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
         },
@@ -143,26 +132,15 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(0, 25),
             width: Math.max(50, 250 - level * 50),
             height: Math.min(150, 25 + level * 50),
-            color: Color.LightGray,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
         },
-    ]),
-    "test": (_: number) => ([
-        {
-            posoffset: new Vector(0, 0),
-            width: 2000,
-            height: 50,
-            color: Color.Yellow,
-            collisionType: CollisionType.Fixed,
-        }
     ]),
     "start": (_: number) => ([
         {
             posoffset: new Vector(100, -100),
             width: 200,
             height: 200,
-            color: Color.fromHex('#00000020'),
             collisionType: CollisionType.Passive,
         }
     ]),
@@ -171,7 +149,6 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             posoffset: new Vector(-100, -100),
             width: 200,
             height: 200,
-            color: Color.fromHex('#00000020'),
             collisionType: CollisionType.Passive,
         }
     ]),
@@ -196,7 +173,7 @@ export class PlatformUnit extends Actor {
             y: data.posoffset.y,
             width: data.width,
             height: data.height,
-            color: data.color,
+            color: Config.PlatformColors[pattern] || Color.Violet,
             collisionType: data.collisionType
         });
 
