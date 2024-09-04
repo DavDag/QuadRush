@@ -2,7 +2,7 @@ import {Vector} from "excalibur";
 
 export const Config = {
     // Settings (can change)
-    volume: 0.5,
+    volume: 0.1,
 
     // Window
     WindowWidth: 800,
@@ -16,7 +16,8 @@ export const Config = {
     Gravity: 800,
     LevelLength: 2800,
     PlatformHeight: -50,
-    PlatformFallingTime: 500,
+    PlatformFallingSpeed: 500,
+    PlatformTimeBeforeFalling: 500,
 
     // Graphics
     PoleWidth: 8,

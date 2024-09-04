@@ -99,7 +99,6 @@ export class Player extends Actor {
     }
 
     onCollisionStart(self: Collider, other: Collider, side: Side, contact: CollisionContact) {
-        console.debug(other.owner.name);
         if (this.isDead || this.hasWon || this.isPaused) return;
 
         // Check for collision with end platform (winning condition)

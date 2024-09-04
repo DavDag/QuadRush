@@ -1,7 +1,7 @@
-import {Resources} from "./resources";
-import {Actor, Collider, CollisionContact, CollisionType, Color, Engine, Scene, Side, Timer, Vector} from "excalibur";
+import {Actor, Collider, CollisionContact, CollisionType, Color, Engine, Side, Timer, Vector} from "excalibur";
 import {Config} from "../config";
 import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
+import {Resources} from "./resources";
 
 interface PlatformUnitGenOptions {
     posoffset: Vector,
@@ -10,7 +10,11 @@ interface PlatformUnitGenOptions {
     color: Color,
     collisionType: CollisionType,
     willvanish?: boolean,
-    movingy?: [number, number, number],
+    moving?: {
+        startoff: number,
+        endoff: number,
+        duration: number,
+    },
 }
 
 export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUnitGenOptions[]) } = {
@@ -41,7 +45,11 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             color: Color.Vermilion,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
-            movingy: [0, -100, Math.max(500, 3000 - level * 500)],
+            moving: {
+                startoff: 0,
+                endoff: -100,
+                duration: Math.max(500, 3000 - level * 500),
+            },
         },
         {
             posoffset: new Vector(+125, -100),
@@ -50,7 +58,11 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             color: Color.Vermilion,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
-            movingy: [0, 100, Math.max(500, 3000 - level * 500)],
+            moving: {
+                startoff: 0,
+                endoff: +100,
+                duration: Math.max(500, 3000 - level * 500),
+            },
         },
     ]),
     "falling.2.inv": (level: number) => ([
@@ -61,7 +73,11 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             color: Color.Vermilion,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
-            movingy: [0, 100, Math.max(500, 3000 - level * 500)],
+            moving: {
+                startoff: 0,
+                endoff: +100,
+                duration: Math.max(500, 3000 - level * 500),
+            },
         },
         {
             posoffset: new Vector(+125, 0),
@@ -70,7 +86,11 @@ export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUni
             color: Color.Vermilion,
             collisionType: CollisionType.Fixed,
             willvanish: (Math.random() * 30 < level),
-            movingy: [0, -100, Math.max(500, 3000 - level * 500)],
+            moving: {
+                startoff: 0,
+                endoff: -100,
+                duration: Math.max(500, 3000 - level * 500),
+            },
         },
     ]),
     "falling.3": (level: number) => ([
@@ -151,15 +171,14 @@ export type PlatformPatternType = keyof typeof PLATFORM_PATTERNS;
 export class PlatformUnit extends Actor {
 
     private canVanish = false;
-    private isVanishing = false;
     private canMove = false;
-    private startingPos = new Vector(0, 0);
-    private moveOffset = new Vector(0, 0);
-    private moveTime = 0;
+    private isStopped = false;
+
+    private isVanishing = false;
     private currentMoveDirection = 1;
     private currentMoveTime = 0;
 
-    constructor(public readonly pattern: PlatformPatternType, data: PlatformUnitGenOptions) {
+    constructor(public readonly pattern: PlatformPatternType, private data: PlatformUnitGenOptions) {
         super({
             name: 'platform',
             x: data.posoffset.x,
@@ -171,12 +190,7 @@ export class PlatformUnit extends Actor {
         });
 
         this.canVanish = data.willvanish;
-        this.canMove = data.movingy !== undefined;
-        if (this.canMove) {
-            this.startingPos = data.posoffset;
-            this.moveOffset = new Vector(data.movingy![0], data.movingy![1]);
-            this.moveTime = data.movingy![2];
-        }
+        this.canMove = data.moving !== undefined;
     }
 
     onInitialize(engine: Engine) {
@@ -185,11 +199,11 @@ export class PlatformUnit extends Actor {
     }
 
     onPostUpdate(engine: Engine, delta: number) {
-        if (!this.canMove) return;
+        if (!this.canMove || this.isStopped) return;
 
         // Move platform up and down
         this.currentMoveTime += delta * this.currentMoveDirection;
-        if (this.currentMoveTime >= this.moveTime) {
+        if (this.currentMoveTime >= this.data.moving.duration) {
             this.currentMoveTime -= delta;
             this.currentMoveDirection = -1;
         } else if (this.currentMoveTime < 0) {
@@ -197,25 +211,66 @@ export class PlatformUnit extends Actor {
             this.currentMoveDirection = +1;
         }
 
-        const off = (this.moveOffset.y - this.moveOffset.x) * (this.currentMoveTime / this.moveTime);
-        this.pos.y = this.startingPos.y + this.moveOffset.x + off;
+        const f = (this.currentMoveTime / this.data.moving.duration);
+        const off = (this.data.moving.endoff - this.data.moving.startoff) * f;
+        this.pos.y = this.data.posoffset.y + this.data.moving.startoff + off;
     }
 
     onCollisionStart(self: Collider, other: Collider, side: Side, contact: CollisionContact) {
-        if (!this.canVanish) return;
+        if (!this.canVanish || this.isStopped) return;
 
         // Vanish if player touches
         if (other.owner.name === 'player' && !this.isVanishing) {
             this.isVanishing = true;
-            this.actions
-                .fade(0, Config.PlatformFallingTime)
-                .callMethod(this.onVanishComplete.bind(this));
+            this.fall();
         }
     }
 
-    private onVanishComplete() {
-        void Resources.falling.play();
+    public hide(time: number) {
+        this.isStopped = true;
         this.body.collisionType = CollisionType.PreventCollision;
+
+        if (time === 0) {
+            this.graphics.opacity = 0;
+            return;
+        }
+        this.actions
+            .rotateBy(-Math.PI / 2, (Math.PI / 2) / (time / 1000))
+            .callMethod(() => {
+                // TODO: Replace this sound
+                // void Resources.falling.play();
+            });
+    }
+
+    public show(time: number) {
+        this.isStopped = false;
+        this.body.collisionType = this.data.collisionType;
+
+        if (time === 0) {
+            this.graphics.opacity = 1;
+            return;
+        }
+        this.actions.fade(1, time);
+    }
+
+    public fall() {
+        const timer = new Timer({
+            fcn: () => {
+                this.actions
+                    .callMethod(() => {
+                        this.isStopped = true;
+                        this.body.collisionType = CollisionType.PreventCollision;
+                        // TODO: Replace this sound
+                        // void Resources.falling.play();
+                    })
+                    .moveBy(0, Config.WindowHeight, Config.PlatformFallingSpeed)
+                    .callMethod(this.hide.bind(this, 0));
+            },
+            interval: Config.PlatformTimeBeforeFalling,
+            repeats: false,
+        });
+        this.scene.add(timer);
+        timer.start();
     }
 }
 
@@ -240,32 +295,10 @@ export class Platform extends Actor {
     }
 
     public hide(time: number) {
-        if (time === 0) {
-            this.children.forEach((child) => {
-                (child as PlatformUnit).graphics.opacity = 0;
-            });
-            return;
-        }
-
-        this.children.forEach((child) => {
-           (child as PlatformUnit)
-               .actions
-               .fade(0, time);
-        });
+        this.children.forEach((child) => (child as PlatformUnit).hide(time));
     }
 
     public show(time: number) {
-        if (time === 0) {
-            this.children.forEach((child) => {
-                (child as PlatformUnit).graphics.opacity = 1;
-            });
-            return;
-        }
-
-        this.children.forEach((child) => {
-            (child as PlatformUnit)
-                .actions
-                .fade(1, time);
-        });
+        this.children.forEach((child) => (child as PlatformUnit).show(time));
     }
 }
