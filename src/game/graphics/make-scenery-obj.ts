@@ -15,7 +15,7 @@ function CreatePole(): Graphic {
     return new Rectangle({
         width: Config.PoleWidth,
         height: Config.PoleHeight,
-        color: Color.White,
+        color: Color.fromHex("#cd9d5e"),
     });
 }
 
@@ -25,7 +25,7 @@ export function MakeThisASceneryObject(actor: Actor, zIndex: number, hasPole: bo
     const pole = CreatePole();
     const poleShadow = CreateShadow(pole);
 
-    const offset = new Vector(- current.width / 2, - current.height / 2);
+    const offset = new Vector(-current.width / 2, -current.height / 2);
     const group = new GraphicsGroup({
         members: [
             // {

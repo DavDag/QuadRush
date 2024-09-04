@@ -14,7 +14,7 @@ export class GameScene extends Scene {
     private score = 0;
     private level = 0;
 
-    private playerPos = new Vector(-Config.LevelLength / 2 + 2200 + 200, Config.PlatformHeight - 200);
+    private playerPos = new Vector(-Config.LevelLength / 2 + 200 + 200, Config.PlatformHeight - 200);
     private playerVel = new Vector(0, 0);
     private wasClose = false;
     private timerunning = 0;
@@ -23,8 +23,6 @@ export class GameScene extends Scene {
     private platforms: Platform[] = [];
 
     onInitialize(engine: Engine) {
-        super.onInitialize(engine);
-
         Ui.UpdateScore(this.score);
         Ui.UpdateTime(this.timerunning, false);
         Ui.UpdateTimeLimit(this.timelimit);

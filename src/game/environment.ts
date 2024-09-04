@@ -1,4 +1,4 @@
-import {Actor, Color, Engine, ParallaxComponent, Scene, Sprite, Vector} from "excalibur";
+import {Actor, CollisionType, Color, Engine, ParallaxComponent, Scene, Shape, Sprite, Vector} from "excalibur";
 import {Config} from "../config";
 import {Platform} from "./platform";
 import {Resources} from "./resources";
@@ -12,12 +12,11 @@ class VulkanLayer extends Actor {
             width: Config.VulkanLayerSize,
             height: Config.VulkanLayerSize,
             color: Color.fromHex("#ff000020"),
+            collisionType: CollisionType.PreventCollision,
         });
     }
 
     onInitialize(engine: Engine) {
-        super.onInitialize(engine);
-
         const sprite = new Sprite({
             image: Resources.image.BgLayer1,
             sourceView: {
@@ -53,13 +52,12 @@ class Vulkan extends Actor {
     constructor() {
         super({
             name: "vulkan.container",
-            pos: Vector.Zero
+            pos: Vector.Zero,
+            collisionType: CollisionType.PreventCollision,
         });
     }
 
     onInitialize(engine: Engine) {
-        super.onInitialize(engine);
-
         for (let i = 0; i < Config.VulkanZIndexes.length; i++) {
             const layer = new VulkanLayer(i);
             this.addChild(layer);
@@ -79,6 +77,7 @@ class LavaLayer extends Actor {
             width: Config.LavaSize,
             height: Config.LavaSize,
             color: Color.fromHex("#ff000020"),
+            collisionType: CollisionType.PreventCollision,
         });
 
         this.speed = Config.LavaSpeed[this.layer];
@@ -86,8 +85,6 @@ class LavaLayer extends Actor {
     }
 
     onInitialize(engine: Engine) {
-        super.onInitialize(engine);
-
         const sprite = new Sprite({
             image: Resources.image.LavalLayer1,
             sourceView: {
@@ -133,7 +130,13 @@ class Lava extends Actor {
     }
 
     onInitialize(engine: Engine) {
-        super.onInitialize(engine);
+        this.collider.clear();
+        this.collider.useCompositeCollider([
+            Shape.Box(Config.LevelLength + 400, 400, Vector.Half, new Vector(0, Config.PlatformRotationHeight)),
+            Shape.Box(400, Config.LevelLength + 400, Vector.Half, new Vector(-Config.LevelLength / 2 - 400, 0)),
+            Shape.Box(400, Config.LevelLength + 400, Vector.Half, new Vector(+Config.LevelLength / 2 + 400, 0)),
+        ]);
+        this.body.collisionType = CollisionType.Fixed;
 
         for (let i = 0; i < Config.LavaZIndexes.length; i++) {
             const layer = new LavaLayer(i);
@@ -143,40 +146,11 @@ class Lava extends Actor {
 }
 
 export class Environment {
-
     private lava: Lava;
     private vulkan: Vulkan;
 
     constructor(private scene: Scene) {
-        // // Lava
-        // this.lavaL = new Actor({
-        //     name: 'lava',
-        //     pos: new Vector(-250, 0),
-        //     width: 500,
-        //     height: Config.WindowHeight * 3,
-        //     color: Color.Red,
-        //     collisionType: CollisionType.Fixed,
-        // });
-        // this.lavaB = new Actor({
-        //     name: 'lava',
-        //     pos: new Vector(Config.LevelLength / 2, 250),
-        //     width: Config.LevelLength,
-        //     height: 500,
-        //     color: Color.Red,
-        //     collisionType: CollisionType.Fixed,
-        // });
-        // this.lavaR = new Actor({
-        //     name: 'lava',
-        //     pos: new Vector(Config.LevelLength + 250, 0),
-        //     width: 500,
-        //     height: Config.WindowHeight * 3,
-        //     color: Color.Red,
-        //     collisionType: CollisionType.Fixed,
-        // });
-        // // scene.add(this.lavaL);
-        // // scene.add(this.lavaB);
-        // // scene.add(this.lavaR);
-
+        // Environment
         this.lava = new Lava();
         this.vulkan = new Vulkan();
         scene.add(this.lava);

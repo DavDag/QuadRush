@@ -8,7 +8,7 @@ import {
     Engine,
     Keys,
     Shape,
-    Side,
+    Side, Sprite,
     Vector
 } from "excalibur";
 import {Config} from "../config";
@@ -36,7 +36,22 @@ export class Player extends Actor {
     }
 
     onInitialize(engine: Engine) {
-        super.onInitialize(engine);
+        const sprite = new Sprite({
+            image: Resources.image.PaperTexture,
+            sourceView: {
+                x: Math.random() * 1000,
+                y: Math.random() * 1000,
+                width: this.width,
+                height: this.height,
+            },
+            destSize: {
+                width: this.width,
+                height: this.height,
+            },
+            tint: this.color,
+        });
+        this.graphics.use(sprite);
+
         MakeThisASceneryObject(this, Config.PlayerZIndex);
     }
 
@@ -98,6 +113,7 @@ export class Player extends Actor {
     }
 
     onCollisionStart(self: Collider, other: Collider, side: Side, contact: CollisionContact) {
+        console.log(other.owner.name);
         if (this.isDead || this.hasWon || this.isPaused) return;
 
         // Check for collision with end platform (winning condition)
@@ -109,7 +125,7 @@ export class Player extends Actor {
         }
 
         // Check for collision with lava (losing condition)
-        if (other.owner.name === 'lava') {
+        if (other.owner.name === 'lava.container') {
             this.die();
             return;
         }

@@ -1,6 +1,7 @@
-import {Actor, Collider, CollisionContact, CollisionType, Color, Engine, Side, Timer, Vector} from "excalibur";
+import {Actor, Collider, CollisionContact, CollisionType, Color, Engine, Side, Sprite, Timer, Vector} from "excalibur";
 import {Config} from "../config";
 import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
+import {Resources} from "./resources";
 
 interface PlatformUnitGenOptions {
     posoffset: Vector,
@@ -193,7 +194,21 @@ export class PlatformUnit extends Actor {
     }
 
     onInitialize(engine: Engine) {
-        super.onInitialize(engine);
+        const sprite = new Sprite({
+            image: Resources.image.PaperTexture,
+            sourceView: {
+                x: Math.random() * 1000,
+                y: Math.random() * 1000,
+                width: this.width,
+                height: this.height,
+            },
+            destSize: {
+                width: this.width,
+                height: this.height,
+            },
+            tint: this.color,
+        });
+        this.graphics.use(sprite);
 
         if (this.pattern !== 'start' && this.pattern !== 'end') {
             const z = Config.PlatformZIndexes[Math.floor(Math.random() * Config.PlatformZIndexes.length)];
