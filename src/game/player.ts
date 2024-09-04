@@ -7,11 +7,14 @@ import {
     Color,
     Engine,
     GraphicsGroup,
-    Keys, Rectangle, Shape,
+    Keys,
+    Rectangle,
+    Shape,
     Side,
     Vector
 } from "excalibur";
 import {Config} from "../config";
+import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
 
 export class Player extends Actor {
 
@@ -35,49 +38,13 @@ export class Player extends Actor {
 
     onInitialize(engine: Engine) {
         super.onInitialize(engine);
-
-        const current = this.graphics.current;
-        const shadow = current.clone();
-        shadow.tint = Color.Black;
-        const group = new GraphicsGroup({
-            members: [
-                {
-                    graphic: shadow,
-                    offset: new Vector(-25 + Config.shadowOffsetX, -25 + Config.shadowOffsetY)
-                },
-                {
-                    graphic: new Rectangle({
-                        color: Color.Black,
-                        width: 4,
-                        height: Config.windowHeight
-                    }),
-                    offset: new Vector(-25 + 25 - 2 + Config.shadowOffsetX, -25 + 50 + Config.shadowOffsetY),
-                },
-                {
-                    graphic: new Rectangle({
-                        color: Color.White,
-                        width: 4,
-                        height: Config.windowHeight
-                    }),
-                    offset: new Vector(-25 + 25 - 2, -25 + 50),
-                },
-                {
-                    graphic: current,
-                    offset: new Vector(-25, -25),
-                },
-            ],
-            useAnchor: false,
-            origin: new Vector(-25, -25),
-        });
-        this.graphics.use(group);
-
-        this.transform.z = Config.level1zIndex;
+        MakeThisASceneryObject(this, Config.PlayerZIndex);
     }
 
     onPreUpdate(engine: Engine, delta: number) {
         if (this.isDead || this.hasWon || this.isPaused) return;
 
-        // Apply gravity
+        // Apply Gravity
         this.vel.y += 800 * delta / 1000.0;
 
         // Reduce dash duration
@@ -97,13 +64,13 @@ export class Player extends Actor {
             if (this.isDashing > 0 && this.vel.x > 0) {
                 this.isDashing = 0;
             }
-            this.vel.x = -Config.sideSpeed * (this.isDashing > 0 ? Config.dashPower : 1);
+            this.vel.x = -Config.SideSpeed * (this.isDashing > 0 ? Config.DashPower : 1);
         } else if (engine.input.keyboard.isHeld(Keys.Right)
             || engine.input.keyboard.isHeld(Keys.D)) {
             if (this.isDashing > 0 && this.vel.x < 0) {
                 this.isDashing = 0;
             }
-            this.vel.x = Config.sideSpeed * (this.isDashing > 0 ? Config.dashPower : 1);
+            this.vel.x = Config.SideSpeed * (this.isDashing > 0 ? Config.DashPower : 1);
         } else {
             this.vel.x = 0;
         }
@@ -113,7 +80,7 @@ export class Player extends Actor {
                 || engine.input.keyboard.isHeld(Keys.W)
                 || engine.input.keyboard.isHeld(Keys.Space))
             && this.onGround) {
-            this.vel.y = -Config.jumpSpeed;
+            this.vel.y = -Config.JumpSpeed;
             this.onGround = false;
 
             // Play jump sound
@@ -123,7 +90,7 @@ export class Player extends Actor {
         // Dash
         if (engine.input.keyboard.isHeld(Keys.ShiftLeft)
             && this.hasDash) {
-            this.isDashing = Config.dashDuration;
+            this.isDashing = Config.DashDuration;
             this.hasDash = false;
 
             // Play dash sound
@@ -132,6 +99,7 @@ export class Player extends Actor {
     }
 
     onCollisionStart(self: Collider, other: Collider, side: Side, contact: CollisionContact) {
+        console.debug(other.owner.name);
         if (this.isDead || this.hasWon || this.isPaused) return;
 
         // Check for collision with end platform (winning condition)

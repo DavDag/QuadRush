@@ -1,21 +1,31 @@
+import {Vector} from "excalibur";
+
 export const Config = {
+    // Settings (can change)
     volume: 0.5,
 
-    windowWidth: 800,
-    windowHeight: 600,
-    levelLength: 2800,
-    platformHeight: -50,
+    // Window
+    WindowWidth: 800,
+    WindowHeight: 600,
 
-    sideSpeed: 200,
-    jumpSpeed: 450,
-    dashPower: 2,
-    dashDuration: 500,
-    gravity: 800,
+    // Game
+    SideSpeed: 200,
+    JumpSpeed: 450,
+    DashPower: 2,
+    DashDuration: 500,
+    Gravity: 800,
+    LevelLength: 2800,
+    PlatformHeight: -50,
+    PlatformFallingTime: 500,
 
-    shadowOffsetX: -3,
-    shadowOffsetY: -3,
-
-    level1zIndex: 1,
-    level2zIndex: 3,
-    level3zIndex: 5,
+    // Graphics
+    PoleWidth: 8,
+    ShadowOffset: new Vector(-3, -3),
+    PlayerZIndex: 1,
+    PlatformZIndex1: 1,
+    PlatformZIndex2: 1,
+    PlatformZIndex3: 1,
+    LavaZIndex1: 1,
+    LavaZIndex2: 1,
+    LavaZIndex3: 1,
 };

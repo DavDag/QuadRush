@@ -1,8 +1,8 @@
 import {Leaderboard} from "../../api/leaderboard";
-import {CreatePlatforms} from "../platform";
+import {Platform, PlatformPatternType} from "../platform";
 import {Player} from "../player";
 import {Resources} from "../resources";
-import {Actor, Engine, Scene, Timer, Vector} from "excalibur";
+import {Engine, Scene, Timer, Vector} from "excalibur";
 import {Config} from "../../config";
 import {Ui} from "../../ui";
 import {Environment} from "../environment";
@@ -14,13 +14,13 @@ export class GameScene extends Scene {
     private score = 0;
     private level = 0;
 
-    private playerPos = new Vector(200, Config.platformHeight - 200);
+    private playerPos = new Vector(200, Config.PlatformHeight - 200);
     private playerVel = new Vector(0, 0);
     private wasClose = false;
     private timerunning = 0;
     private timelimit = 30;
     private scoretimer: Timer;
-    private platforms: Actor[] = [];
+    private platforms: Platform[] = [];
 
     onInitialize(engine: Engine) {
         super.onInitialize(engine);
@@ -99,7 +99,7 @@ export class GameScene extends Scene {
 
         // Position the camera right to rotate properly
         this.playerPos.x = -this.player.pos.y;
-        this.playerPos.y = Config.platformHeight - (Config.levelLength - this.player.pos.x) + this.player.height;
+        this.playerPos.y = Config.PlatformHeight - (Config.LevelLength - this.player.pos.x) + this.player.height;
         this.player.vel = new Vector(0, 0);
 
         const timer2 = new Timer({
@@ -132,12 +132,12 @@ export class GameScene extends Scene {
 
                     this.camera.rotation = -rot;
                     for (const p of this.platforms) {
-                        p.graphics.opacity = 0;
+                        p.hide(0);
                     }
                     timer2.start();
 
                     for (const p of this.platforms) {
-                        p.actions.fade(1, 1000);
+                        p.show(1000);
                     }
                 }
             },
@@ -149,7 +149,7 @@ export class GameScene extends Scene {
         this.add(timer2);
         timer.start();
         for (const p of this.platforms) {
-            p.actions.fade(0, 1000);
+            p.hide(1000);
         }
 
         this.environment.animateGoingToNextLevel(1000 * 2);
@@ -166,29 +166,22 @@ export class GameScene extends Scene {
         this.camera.strategy.elasticToActor(this.player, 0.1, 0.1);
 
         // Platforms
-        this.platforms = [];
-        for (const p of CreatePlatforms(this, this.level, new Vector(200, Config.platformHeight), "base")) {
-            this.add(p);
-            this.platforms.push(p);
-        }
-        for (const p of CreatePlatforms(this, this.level, new Vector(Config.levelLength - 200, Config.platformHeight), "base")) {
-            this.add(p);
-            this.platforms.push(p);
-        }
+        this.platforms = [
+            new Platform("base", this.level, new Vector(200, Config.PlatformHeight)),
+            new Platform("base", this.level, new Vector(Config.LevelLength - 200, Config.PlatformHeight)),
+        ];
         for (let i = 0; i < 4; i++) {
-            const types = [
+            const types: PlatformPatternType[] = [
                 "falling.1",
                 "falling.2",
                 "falling.2.inv",
                 "falling.3",
                 "falling.4"
             ];
-            const type = types[Math.floor(Math.random() * types.length)];
-            for (const p of CreatePlatforms(this, this.level, new Vector(400 + 250 + 500 * i, Config.platformHeight), type)) {
-                this.add(p);
-                this.platforms.push(p);
-            }
+            const type: PlatformPatternType = types[Math.floor(Math.random() * types.length)];
+            this.platforms.push(new Platform(type, this.level, new Vector(400 + 250 + 500 * i, Config.PlatformHeight)));
         }
+        this.platforms.forEach(this.add.bind(this));
     };
 
     private startScene() {
