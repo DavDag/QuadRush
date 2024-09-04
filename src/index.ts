@@ -6,9 +6,8 @@ import {Ui} from "./ui";
 
 // Resource loader
 const loader = new Loader();
-for (const res in Resources) {
-    loader.addResource(Resources[res]);
-}
+Object.values(Resources.image).forEach(loader.addResource.bind(loader));
+Object.values(Resources.music).forEach(loader.addResource.bind(loader));
 
 // Game engine
 const game = new Engine({
@@ -32,6 +31,15 @@ game.input.keyboard.on('down', (evt: any) => {
     // P to toggle debug mode
     if (evt.key === Keys.P) {
         game.toggleDebug();
+    }
+});
+
+game.input.pointers.primary.on('wheel', (evt: any) => {
+   // Zoom in/out
+    if (evt.deltaY > 0) {
+        game.currentScene.camera.zoom *= 0.9;
+    } else {
+        game.currentScene.camera.zoom *= 1.1;
     }
 });
 

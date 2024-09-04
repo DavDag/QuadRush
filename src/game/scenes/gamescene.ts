@@ -14,7 +14,7 @@ export class GameScene extends Scene {
     private score = 0;
     private level = 0;
 
-    private playerPos = new Vector(200, Config.PlatformHeight - 200);
+    private playerPos = new Vector(-Config.LevelLength / 2 + 200, Config.PlatformHeight - 200);
     private playerVel = new Vector(0, 0);
     private wasClose = false;
     private timerunning = 0;
@@ -38,7 +38,7 @@ export class GameScene extends Scene {
 
                 if (close && !this.wasClose) {
                     this.wasClose = true;
-                    void Resources.danger.play(Config.volume);
+                    void Resources.music.Danger.play(Config.volume);
                 }
                 if (time >= this.timelimit) {
                     this.player.die();
@@ -64,8 +64,8 @@ export class GameScene extends Scene {
         // Zoom in the camera over 1 second
         void this.camera.zoomOverTime(2, 1000);
 
-        // Play death sound
-        void Resources.death.play(Config.volume);
+        // Play Death sound
+        void Resources.music.Death.play(Config.volume);
 
         // Wait 1-second then call GameOver
         const timer = new Timer({
@@ -85,7 +85,7 @@ export class GameScene extends Scene {
         this.player.isPaused = true;
 
         // Play win sound
-        void Resources.levelcomplete.play(Config.volume);
+        void Resources.music.LevelComplete.play(Config.volume);
 
         // Stop the timer
         this.score += this.timerunning * (this.level + 1);
@@ -99,7 +99,7 @@ export class GameScene extends Scene {
 
         // Position the camera right to rotate properly
         this.playerPos.x = -this.player.pos.y;
-        this.playerPos.y = Config.PlatformHeight - (Config.LevelLength - this.player.pos.x) + this.player.height;
+        this.playerPos.y = this.player.pos.x;
         this.player.vel = new Vector(0, 0);
 
         const timer2 = new Timer({
@@ -139,6 +139,7 @@ export class GameScene extends Scene {
                     for (const p of this.platforms) {
                         p.show(1000);
                     }
+                    this.environment.rotateToLevel(this.level);
                 }
             },
             repeats: true,
@@ -151,8 +152,6 @@ export class GameScene extends Scene {
         for (const p of this.platforms) {
             p.hide(1000);
         }
-
-        this.environment.animateGoingToNextLevel(1000 * 2);
     };
 
     private fillLevel() {
@@ -168,19 +167,20 @@ export class GameScene extends Scene {
 
         // Platforms
         this.platforms = [
-            new Platform("base", this.level, new Vector(200, Config.PlatformHeight)),
-            new Platform("base", this.level, new Vector(Config.LevelLength - 200, Config.PlatformHeight)),
+            new Platform("base", this.level, new Vector(-Config.LevelLength / 2 + 200, Config.PlatformHeight)),
+            new Platform("base", this.level, new Vector(+Config.LevelLength / 2 - 200, Config.PlatformHeight)),
         ];
         for (let i = 0; i < 4; i++) {
             const types: PlatformPatternType[] = [
-                // "falling.1",
-                // "falling.2",
-                // "falling.2.inv",
-                // "falling.3",
+                "falling.1",
+                "falling.2",
+                "falling.2.inv",
+                "falling.3",
                 "falling.4"
             ];
             const type: PlatformPatternType = types[Math.floor(Math.random() * types.length)];
-            this.platforms.push(new Platform(type, this.level, new Vector(400 + 250 + 500 * i, Config.PlatformHeight)));
+            const ppos = new Vector(-Config.LevelLength / 2 + 400 + 250 + 500 * i, Config.PlatformHeight);
+            this.platforms.push(new Platform(type, this.level, ppos));
         }
         this.platforms.forEach(this.add.bind(this));
     };

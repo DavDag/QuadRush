@@ -245,14 +245,14 @@ export class PlatformUnit extends Actor {
         this.body.collisionType = CollisionType.PreventCollision;
 
         if (time === 0) {
-            this.graphics.opacity = 0;
+            this.rotation = Math.PI / 2;
             return;
         }
         this.actions
             .rotateBy(-Math.PI / 2, (Math.PI / 2) / (time / 1000))
             .callMethod(() => {
                 // TODO: Replace this sound
-                // void Resources.falling.play();
+                // void Resources.Falling.play();
             });
     }
 
@@ -261,10 +261,15 @@ export class PlatformUnit extends Actor {
         this.body.collisionType = this.data.collisionType;
 
         if (time === 0) {
-            this.graphics.opacity = 1;
+            this.rotation = 0;
             return;
         }
-        this.actions.fade(1, time);
+        this.actions
+            .callMethod(() => {
+                // TODO: Replace this sound
+                // void Resources.Falling.play();
+            })
+            .rotateBy(-Math.PI / 2, (Math.PI / 2) / (time / 1000));
     }
 
     public fall() {
@@ -275,7 +280,7 @@ export class PlatformUnit extends Actor {
                         this.isStopped = true;
                         this.body.collisionType = CollisionType.PreventCollision;
                         // TODO: Replace this sound
-                        // void Resources.falling.play();
+                        // void Resources.Falling.play();
                     })
                     .moveBy(0, Config.WindowHeight, Config.PlatformFallingSpeed)
                     .callMethod(this.hide.bind(this, 0));

@@ -1,4 +1,4 @@
-import {Actor, Color, CompositeCollider, Graphic, GraphicsGroup, Rectangle, Vector} from "excalibur";
+import {Actor, Color, Graphic, GraphicsGroup, Rectangle, Vector} from "excalibur";
 import {Config} from "../../config";
 
 function CreateShadow(current: Graphic): Graphic {
@@ -16,7 +16,7 @@ function CreatePole(): Graphic {
     });
 }
 
-export function MakeThisASceneryObject(actor: Actor, zIndex: number): void {
+export function MakeThisASceneryObject(actor: Actor, zIndex: number, hasPole: boolean = true): void {
     const current = actor.graphics.current;
     const currentShadow = CreateShadow(current);
     const pole = CreatePole();
@@ -50,5 +50,9 @@ export function MakeThisASceneryObject(actor: Actor, zIndex: number): void {
         origin: Vector.Zero,
     });
     actor.graphics.use(group);
-    actor.transform.z = zIndex;
+    actor.z = zIndex;
+
+    if (!hasPole) {
+        group.members.splice(1, 2);
+    }
 }

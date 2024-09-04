@@ -6,15 +6,14 @@ import {
     CollisionType,
     Color,
     Engine,
-    GraphicsGroup,
     Keys,
-    Rectangle,
     Shape,
     Side,
     Vector
 } from "excalibur";
 import {Config} from "../config";
 import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
+import {PlatformUnit} from "./platform";
 
 export class Player extends Actor {
 
@@ -47,7 +46,7 @@ export class Player extends Actor {
         // Apply Gravity
         this.vel.y += 800 * delta / 1000.0;
 
-        // Reduce dash duration
+        // Reduce Dash duration
         if (this.isDashing > 0) {
             this.isDashing -= delta;
             if (this.isDashing <= 0) {
@@ -83,8 +82,8 @@ export class Player extends Actor {
             this.vel.y = -Config.JumpSpeed;
             this.onGround = false;
 
-            // Play jump sound
-            void Resources.jump.play(Config.volume);
+            // Play Jump sound
+            void Resources.music.Jump.play(Config.volume);
         }
 
         // Dash
@@ -93,8 +92,8 @@ export class Player extends Actor {
             this.isDashing = Config.DashDuration;
             this.hasDash = false;
 
-            // Play dash sound
-            void Resources.dash.play(Config.volume);
+            // Play Dash sound
+            void Resources.music.Dash.play(Config.volume);
         }
     }
 
@@ -102,7 +101,7 @@ export class Player extends Actor {
         if (this.isDead || this.hasWon || this.isPaused) return;
 
         // Check for collision with end platform (winning condition)
-        if (other.owner.name === 'platform' && other.owner["pattern"] === 'end') {
+        if (other.owner.name === 'platform' && (other.owner as PlatformUnit).pattern === 'end') {
             this.hasWon = true;
             this.isPaused = true;
             this.vel = new Vector(0, 0);
@@ -116,7 +115,8 @@ export class Player extends Actor {
         }
 
         // Check for collision with ground (reset jumping ability)
-        if (side === Side.Bottom) {
+        if (other.owner.name === 'platform' && (other.owner as PlatformUnit).pattern !== 'start'
+            && side === Side.Bottom) {
             this.onGround = true;
         }
     }

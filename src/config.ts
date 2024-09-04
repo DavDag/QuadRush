@@ -15,20 +15,21 @@ export const Config = {
     DashDuration: 500,
     Gravity: 800,
     LevelLength: 2800,
-    PlatformHeight: -50,
+    PlatformHeight: 1400,
     PlatformFallingSpeed: 500,
     PlatformTimeBeforeFalling: 500,
 
     // Graphics
     PoleWidth: 8,
     PoleHeight: 600,
-    PlatformRotationHeight: 100,
+    PlatformRotationHeight: 1550,
     ShadowOffset: new Vector(-3, -3),
     PlayerZIndex: 1,
     PlatformZIndex1: 1,
     PlatformZIndex2: 1,
     PlatformZIndex3: 1,
-    LavaZIndex1: 1,
-    LavaZIndex2: 1,
-    LavaZIndex3: 1,
+    LavaSize: 4000,
+    LavaZIndexes: [1, 2, 3],
+    VulkanLayerSize: 3600,
+    VulkanZIndexes: [-1, -2, -3]
 };
