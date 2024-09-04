@@ -2,10 +2,12 @@ import {Actor, Color, Graphic, GraphicsGroup, Rectangle, Vector} from "excalibur
 import {Config} from "../../config";
 
 function CreateShadow(current: Graphic): Graphic {
+    // TODO: Improve shadows
+    // Make them responsive to ShadowOffset
+    // otherwise, they will be off when rotating its parent
     const shadow = current.clone();
     shadow.tint = Color.fromHex("#000000ff");
     shadow.opacity = 0.75;
-    shadow.rotation = 0;
     return shadow;
 }
 
@@ -26,17 +28,17 @@ export function MakeThisASceneryObject(actor: Actor, zIndex: number, hasPole: bo
     const offset = new Vector(- current.width / 2, - current.height / 2);
     const group = new GraphicsGroup({
         members: [
-            {
-                graphic: currentShadow,
-                offset: offset
-                    .add(Config.ShadowOffset),
-            },
-            {
-                graphic: poleShadow,
-                offset: offset
-                    .add(new Vector(-pole.width / 2 + current.width / 2, current.height / 2))
-                    .add(Config.ShadowOffset),
-            },
+            // {
+            //     graphic: currentShadow,
+            //     offset: offset
+            //         .add(Config.ShadowOffset),
+            // },
+            // {
+            //     graphic: poleShadow,
+            //     offset: offset
+            //         .add(new Vector(-pole.width / 2 + current.width / 2, current.height / 2))
+            //         .add(Config.ShadowOffset),
+            // },
             {
                 graphic: pole,
                 offset: offset
@@ -54,6 +56,6 @@ export function MakeThisASceneryObject(actor: Actor, zIndex: number, hasPole: bo
     actor.z = zIndex;
 
     if (!hasPole) {
-        group.members.splice(1, 2);
+        group.members.splice(0, 1);
     }
 }

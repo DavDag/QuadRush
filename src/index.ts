@@ -12,7 +12,6 @@ Object.values(Resources.music).forEach(loader.addResource.bind(loader));
 // Game engine
 const game = new Engine({
     canvasElementId: 'game',
-    antialiasing: false,
     fixedUpdateFps: 60,
     backgroundColor: Color.fromHex('#5fcde4'),
     displayMode: DisplayMode.Fixed,

@@ -28,7 +28,7 @@ export const Config = {
     PlatformZIndexes: [0, 2, 4],
     LavaSize: 4000,
     LavaZIndexes: [1, 3, 5],
-    LavaSpeed: 100,
+    LavaSpeed: [100, 60, 80],
     VulkanLayerSize: 3600,
-    VulkanZIndexes: [-1, -2, -3]
+    VulkanZIndexes: [-1, -2, -3, -4, -5]
 };

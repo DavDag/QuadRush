@@ -260,8 +260,8 @@ export class PlatformUnit extends Actor {
     }
 
     public show(time: number) {
-        this.isStopped = false;
-        this.body.collisionType = this.data.collisionType;
+        this.isStopped = true;
+        this.body.collisionType = CollisionType.PreventCollision;
 
         if (time === 0) {
             this.rotation = 0;
@@ -272,7 +272,11 @@ export class PlatformUnit extends Actor {
                 // TODO: Replace this sound
                 // void Resources.Falling.play();
             })
-            .rotateBy(-Math.PI / 2, (Math.PI / 2) / (time / 1000));
+            .rotateBy(-Math.PI / 2, (Math.PI / 2) / (time / 1000))
+            .callMethod(() => {
+                this.isStopped = false;
+                this.body.collisionType = this.data.collisionType;
+            });
     }
 
     public fall() {

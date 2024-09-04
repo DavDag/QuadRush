@@ -32,9 +32,11 @@ class VulkanLayer extends Actor {
             },
             tint: [
                 Color.fromHex("#666600"),
+                Color.fromHex("#888800"),
                 Color.fromHex("#aaaa00"),
+                Color.fromHex("#cccc00"),
                 Color.fromHex("#ffff00"),
-            ][this.layer % 3]
+            ][this.layer % 5]
         });
         this.graphics.use(sprite);
         this.rotation = Math.PI / 2 * this.layer;
@@ -67,7 +69,8 @@ class Vulkan extends Actor {
 
 class LavaLayer extends Actor {
 
-    private direction: number = 1;
+    private speed = 0;
+    private direction = 1;
 
     constructor(private layer: number) {
         super({
@@ -78,6 +81,7 @@ class LavaLayer extends Actor {
             color: Color.fromHex("#ff000020"),
         });
 
+        this.speed = Config.LavaSpeed[this.layer];
         this.direction = layer % 2 === 0 ? 1 : -1;
     }
 
@@ -111,7 +115,7 @@ class LavaLayer extends Actor {
 
     onPreUpdate(engine: Engine, delta: number) {
         // TODO: Remove and use sprite animation
-        this.pos.x += this.direction * Config.LavaSpeed * (delta / 1000);
+        this.pos.x += this.direction * this.speed * (delta / 1000);
         if (this.pos.x > 100) {
             this.direction = -1;
         } else if (this.pos.x < -100) {
