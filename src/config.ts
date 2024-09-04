@@ -21,6 +21,8 @@ export const Config = {
 
     // Graphics
     PoleWidth: 8,
+    PoleHeight: 600,
+    PlatformRotationHeight: 100,
     ShadowOffset: new Vector(-3, -3),
     PlayerZIndex: 1,
     PlatformZIndex1: 1,

@@ -164,6 +164,7 @@ export class GameScene extends Scene {
         this.camera.pos = this.playerPos;
         this.camera.clearAllStrategies();
         this.camera.strategy.elasticToActor(this.player, 0.1, 0.1);
+        this.camera.zoom = Math.min(1, 0.75 + this.level * 0.05);
 
         // Platforms
         this.platforms = [
@@ -172,10 +173,10 @@ export class GameScene extends Scene {
         ];
         for (let i = 0; i < 4; i++) {
             const types: PlatformPatternType[] = [
-                "falling.1",
-                "falling.2",
-                "falling.2.inv",
-                "falling.3",
+                // "falling.1",
+                // "falling.2",
+                // "falling.2.inv",
+                // "falling.3",
                 "falling.4"
             ];
             const type: PlatformPatternType = types[Math.floor(Math.random() * types.length)];

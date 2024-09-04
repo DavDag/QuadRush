@@ -1,4 +1,4 @@
-import {Actor, Color, Graphic, GraphicsGroup, Rectangle, Vector} from "excalibur";
+import {Actor, Color, CompositeCollider, Graphic, GraphicsGroup, Rectangle, Vector} from "excalibur";
 import {Config} from "../../config";
 
 function CreateShadow(current: Graphic): Graphic {
@@ -11,7 +11,7 @@ function CreateShadow(current: Graphic): Graphic {
 function CreatePole(): Graphic {
     return new Rectangle({
         width: Config.PoleWidth,
-        height: Config.WindowHeight,
+        height: Config.PoleHeight,
         color: Color.White,
     });
 }
@@ -22,28 +22,32 @@ export function MakeThisASceneryObject(actor: Actor, zIndex: number): void {
     const pole = CreatePole();
     const poleShadow = CreateShadow(pole);
 
-    const origin = new Vector(-current.width / 2, -current.height / 2);
+    const offset = new Vector(- current.width / 2, - current.height / 2);
     const group = new GraphicsGroup({
         members: [
             {
                 graphic: currentShadow,
-                offset: origin.add(Config.ShadowOffset),
+                offset: offset
+                    .add(Config.ShadowOffset),
             },
             {
                 graphic: poleShadow,
-                offset: new Vector(-pole.width / 2, 0).add(Config.ShadowOffset),
+                offset: offset
+                    .add(new Vector(-pole.width / 2 + current.width / 2, current.height / 2))
+                    .add(Config.ShadowOffset),
             },
             {
                 graphic: pole,
-                offset: new Vector(-pole.width / 2, 0),
+                offset: offset
+                    .add(new Vector(-pole.width / 2 + current.width / 2, current.height / 2)),
             },
             {
                 graphic: current,
-                offset: origin,
+                offset: offset,
             },
         ],
         useAnchor: false,
-        origin: origin,
+        origin: Vector.Zero,
     });
     actor.graphics.use(group);
     actor.transform.z = zIndex;

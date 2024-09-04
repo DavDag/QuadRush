@@ -186,7 +186,7 @@ export class PlatformUnit extends Actor {
             width: data.width,
             height: data.height,
             color: data.color,
-            collisionType: data.collisionType,
+            collisionType: data.collisionType
         });
 
         this.canVanish = data.willvanish;
@@ -196,6 +196,20 @@ export class PlatformUnit extends Actor {
     onInitialize(engine: Engine) {
         super.onInitialize(engine);
         MakeThisASceneryObject(this, Config.PlatformZIndex1);
+
+        this.graphics.onPreDraw = (ctx, delta) => {
+            ctx.save();
+
+            // Make rotation pivot around the center offset by half the height of the pole
+            ctx.rotate(-this.rotation);
+            ctx.translate(0, Config.PlatformRotationHeight - this.center.y)
+            ctx.rotate(this.rotation);
+            ctx.translate(0, -(Config.PlatformRotationHeight - this.center.y));
+        }
+
+        this.graphics.onPostDraw = (ctx, delta) => {
+            ctx.restore();
+        }
     }
 
     onPostUpdate(engine: Engine, delta: number) {
@@ -292,6 +306,10 @@ export class Platform extends Actor {
         for (const data of children) {
             this.addChild(new PlatformUnit(this.pattern, data));
         }
+    }
+
+    onInitialize(engine: Engine) {
+        super.onInitialize(engine);
     }
 
     public hide(time: number) {
