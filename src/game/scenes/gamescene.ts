@@ -14,8 +14,6 @@ export class GameScene extends Scene {
     private score = 0;
     private level = 0;
 
-    private playerPos = new Vector(-Config.LevelLength / 2 + 200 + 200, Config.PlatformHeight - 200);
-    private playerVel = new Vector(0, 0);
     private wasClose = false;
     private timerunning = 0;
     private timelimit = 30;
@@ -27,29 +25,24 @@ export class GameScene extends Scene {
         Ui.UpdateTime(this.timerunning, false);
         Ui.UpdateTimeLimit(this.timelimit);
 
+        // Add score timer
         this.scoretimer = new Timer({
-            fcn: () => {
-                this.timerunning += 100;
-                const time = this.timerunning / 1000;
-                const close = time >= (this.timelimit * 0.75); // only 25% time left
-                Ui.UpdateTime(time, close);
-
-                if (close && !this.wasClose) {
-                    this.wasClose = true;
-                    void Resources.music.Danger.play(Config.volume);
-                }
-                if (time >= this.timelimit) {
-                    this.player.die();
-                    this.onDie();
-                }
-            },
+            fcn: this.updateScore.bind(this),
             repeats: true,
-            interval: 100,
+            interval: Config.ScoreTimerInterval,
         });
         this.add(this.scoretimer);
 
+        // Add environment
         this.environment = new Environment(this);
 
+        // Add player & camera
+        this.player = new Player(this.onDie.bind(this), this.onWin.bind(this));
+        this.player.pos = new Vector(-Config.LevelLength / 2 + 200, Config.PlatformHeight - 200);
+        this.add(this.player);
+        this.camera.strategy.elasticToActor(this.player, 0.1, 0.1);
+
+        // Add platforms for level
         this.fillLevel();
         this.startScene();
     }
@@ -60,18 +53,16 @@ export class GameScene extends Scene {
         this.player.isPaused = true;
 
         // Zoom in the camera over 1 second
-        void this.camera.zoomOverTime(2, 1000);
+        void this.camera.zoomOverTime(Config.CameraZoomOnDeath, Config.GameOverDelay);
 
         // Play Death sound
         void Resources.music.Death.play(Config.volume);
 
-        // Wait 1-second then call GameOver
+        // Wait delay then call GameOver
         const timer = new Timer({
-            fcn: () => {
-                window["GameOver"](this.score);
-            },
+            fcn: () => window["GameOver"](this.score),
             repeats: false,
-            interval: 1000,
+            interval: Config.GameOverDelay,
         });
         this.add(timer);
         timer.start();
@@ -95,73 +86,13 @@ export class GameScene extends Scene {
                 });
             });
 
-        // Position the camera right to rotate properly
-        this.playerPos.x = -this.player.pos.y;
-        this.playerPos.y = this.player.pos.x;
-        this.player.vel = new Vector(0, 0);
-
-        const timer2 = new Timer({
-            fcn: () => {
-                this.camera.rotation += (Math.PI / 4) / 100;
-                if (this.camera.rotation >= 0) {
-                    timer2.stop();
-
-                    this.camera.rotation = 0;
-                    this.startScene();
-                }
-            },
-            repeats: true,
-            interval: 10,
-        });
-
-        const timer = new Timer({
-            fcn: () => {
-                this.camera.rotation += (Math.PI / 4) / 100;
-                if (this.camera.rotation >= Math.PI / 4) {
-                    timer.stop();
-
-                    const rot = this.camera.rotation;
-                    for (const p of this.platforms) {
-                        p.kill();
-                    }
-                    this.player.kill();
-                    this.level++;
-                    this.fillLevel();
-
-                    this.camera.rotation = -rot;
-                    for (const p of this.platforms) {
-                        p.hide(0);
-                    }
-                    timer2.start();
-
-                    for (const p of this.platforms) {
-                        p.show(1000);
-                    }
-                    this.environment.rotateToLevel(this.level);
-                }
-            },
-            repeats: true,
-            interval: 10,
-        });
-
-        this.add(timer);
-        this.add(timer2);
-        timer.start();
-        for (const p of this.platforms) {
-            p.hide(1000);
-        }
+        // Animate the camera rotation
+        this.animateLevelComplete();
     };
 
     private fillLevel() {
-        // Recreate player
-        this.player = new Player(this.onDie.bind(this), this.onWin.bind(this));
-        this.add(this.player);
-        this.player.pos = this.playerPos;
-        this.player.vel = this.playerVel;
-        this.camera.pos = this.playerPos;
-        this.camera.clearAllStrategies();
-        this.camera.strategy.elasticToActor(this.player, 0.1, 0.1);
-        this.camera.zoom = Math.min(1, 0.75 + this.level * 0.05);
+        // Zoom in
+        this.camera.zoom = Math.min(Config.CameraMaxZoom, Config.CameraStartZoom + this.level * Config.CameraZoomIncrement);
 
         // Platforms
         this.platforms = [
@@ -171,17 +102,17 @@ export class GameScene extends Scene {
         for (let i = 0; i < 4; i++) {
             const types: PlatformPatternType[] = [
                 "falling.1",
-                "falling.2",
-                "falling.2.inv",
-                "falling.3",
-                "falling.4"
+                // "falling.2",
+                // "falling.2.inv",
+                // "falling.3",
+                // "falling.4"
             ];
             const type: PlatformPatternType = types[Math.floor(Math.random() * types.length)];
             const ppos = new Vector(-Config.LevelLength / 2 + 400 + 250 + 500 * i, Config.PlatformHeight);
             this.platforms.push(new Platform(type, this.level, ppos));
         }
         this.platforms.forEach(this.add.bind(this));
-    };
+    }
 
     private startScene() {
         this.wasClose = false;
@@ -191,5 +122,99 @@ export class GameScene extends Scene {
         this.scoretimer.reset();
         this.scoretimer.start();
         Ui.UpdateTimeLimit(this.timelimit);
+    }
+
+    private animateLevelComplete() {
+        // This timer animates the camera rotation from -45° to 0°
+        const backward = new Timer({
+            fcn: () => {
+                this.camera.rotation += (Math.PI / 4) / (Config.LevelChangeDuration / 2 / Config.LevelChangeAnimInterval);
+                if (this.camera.rotation >= 0) {
+                    backward.stop();
+                    this.camera.rotation = 0;
+                    this.startScene();
+                }
+            },
+            repeats: true,
+            interval: Config.LevelChangeAnimInterval,
+        });
+
+        // This timer animates the camera rotation from 0° to 45°
+        const forward = new Timer({
+            fcn: () => {
+                this.camera.rotation += (Math.PI / 4) / (Config.LevelChangeDuration / 2 / Config.LevelChangeAnimInterval);
+                if (this.camera.rotation >= Math.PI / 4) {
+                    forward.stop();
+                    backward.start();
+                    this.onLevelSwitch();
+                }
+            },
+            repeats: true,
+            interval: Config.LevelChangeAnimInterval,
+        });
+
+        // Add the timers to the scene
+        this.add(forward);
+        this.add(backward);
+
+        // Start the forward timer
+        forward.start();
+
+        // Animate platforms going away
+        this.platforms.forEach((p) => p.hide(Config.LevelChangeDuration / 2));
+    }
+
+    private onLevelSwitch() {
+        // Save current camera rotation (~45°)
+        const rot = this.camera.rotation;
+
+        // Remove all platforms
+        this.platforms.forEach((p) => p.kill());
+
+        // Move player to start position
+        const px = this.player.pos.x;
+        const py = this.player.pos.y;
+        this.player.pos.x = -py;
+        this.player.pos.y = px;
+
+        // Move camera to player
+        this.camera.pos = this.player.pos;
+
+        // Increase level
+        this.level++;
+        this.fillLevel();
+
+        // Restore camera rotation (reverse)
+        this.camera.rotation = -rot;
+
+        // Set platforms to invisible
+        this.platforms.forEach((p) => p.hide(0));
+
+        // Animate platforms coming back
+        this.platforms.forEach((p) => p.show(Config.LevelChangeDuration / 2));
+
+        // Rotate environment to keep the illusion
+        this.environment.rotateToLevel(this.level);
+    }
+
+    private updateScore() {
+        // Update time
+        this.timerunning += Config.ScoreTimerInterval;
+
+        // Update UI
+        const time = this.timerunning / 1000;
+        const close = time >= (this.timelimit * Config.TimeThresholdForClose); // only 25% time left
+        Ui.UpdateTime(time, close);
+
+        // Play danger sound (once)
+        if (close && !this.wasClose) {
+            this.wasClose = true;
+            void Resources.music.Danger.play(Config.volume);
+        }
+
+        // Check if time is up
+        if (time >= this.timelimit) {
+            this.player.die();
+        }
     }
 }

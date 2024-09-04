@@ -1,6 +1,5 @@
-import {Actor, Color, Graphic, GraphicsGroup, Rectangle, Sprite, Vector} from "excalibur";
+import {Actor, Color, Graphic, GraphicsGroup, Rectangle, Vector} from "excalibur";
 import {Config} from "../../config";
-import {Resources} from "../resources";
 
 function CreateShadow(current: Graphic): Graphic {
     // TODO: Improve shadows
@@ -27,7 +26,7 @@ export function MakeThisASceneryObject(actor: Actor, zIndex: number, hasPole: bo
     const currentShadow = CreateShadow(current);
     const pole = CreatePole();
     const poleShadow = CreateShadow(pole);
-    const boundsBorder = new Rectangle({
+    const borders = new Rectangle({
         width: actor.width,
         height: actor.height,
         color: Color.Transparent,
@@ -58,7 +57,7 @@ export function MakeThisASceneryObject(actor: Actor, zIndex: number, hasPole: bo
                 offset: offset,
             },
             {
-                graphic: boundsBorder,
+                graphic: borders,
                 offset: offset,
             },
         ],

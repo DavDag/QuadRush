@@ -8,7 +8,8 @@ import {
     Engine,
     Keys,
     Shape,
-    Side, Sprite,
+    Side,
+    Sprite,
     Vector
 } from "excalibur";
 import {Config} from "../config";
@@ -17,9 +18,7 @@ import {PlatformUnit} from "./platform";
 
 export class Player extends Actor {
 
-    public isPaused = true;
-    private hasWon = false;
-    private isDead = false;
+    public isPaused = false;
     private onGround = false;
     private hasDash = false;
     private isDashing = 0;
@@ -29,13 +28,14 @@ export class Player extends Actor {
             name: 'player',
             width: 50,
             height: 50,
-            color: Color.White,
+            color: Color.Violet,
             collisionType: CollisionType.Active,
             collider: Shape.Box(50, 50),
         });
     }
 
     onInitialize(engine: Engine) {
+        // Add player sprite
         const sprite = new Sprite({
             image: Resources.image.PaperTexture,
             sourceView: {
@@ -48,26 +48,29 @@ export class Player extends Actor {
                 width: this.width,
                 height: this.height,
             },
-            tint: this.color,
+            tint: Config.PlayerColor,
         });
         this.graphics.use(sprite);
 
+        // Make player a scenery object
         MakeThisASceneryObject(this, Config.PlayerZIndex, true, true);
     }
 
     onPreUpdate(engine: Engine, delta: number) {
-        if (this.isDead || this.hasWon || this.isPaused) return;
+        if (this.isPaused) return;
 
         // Apply Gravity
         this.vel.y += 800 * delta / 1000.0;
 
-        // Reduce Dash duration
+        // Reduce dash duration
         if (this.isDashing > 0) {
             this.isDashing -= delta;
             if (this.isDashing <= 0) {
                 this.isDashing = 0;
             }
         }
+
+        // Check to reset dash
         if (this.isDashing <= 0 && this.onGround) {
             this.hasDash = true;
         }
@@ -113,12 +116,10 @@ export class Player extends Actor {
     }
 
     onCollisionStart(self: Collider, other: Collider, side: Side, contact: CollisionContact) {
-        console.log(other.owner.name);
-        if (this.isDead || this.hasWon || this.isPaused) return;
+        if (this.isPaused) return;
 
         // Check for collision with end platform (winning condition)
         if (other.owner.name === 'platform' && (other.owner as PlatformUnit).pattern === 'end') {
-            this.hasWon = true;
             this.isPaused = true;
             this.vel = new Vector(0, 0);
             this.OnWin();
@@ -138,7 +139,6 @@ export class Player extends Actor {
     }
 
     public die() {
-        this.isDead = true;
         this.isPaused = true;
         this.vel = new Vector(0, 0);
         this.OnDie();

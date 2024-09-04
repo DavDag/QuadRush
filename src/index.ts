@@ -13,7 +13,7 @@ Object.values(Resources.music).forEach(loader.addResource.bind(loader));
 const game = new Engine({
     canvasElementId: 'game',
     fixedUpdateFps: 60,
-    backgroundColor: Color.fromHex('#000000'),
+    backgroundColor: Color.ExcaliburBlue,
     displayMode: DisplayMode.Fixed,
     pixelArt: true,
 });
@@ -35,7 +35,7 @@ game.input.keyboard.on('down', (evt: any) => {
 });
 
 game.input.pointers.primary.on('wheel', (evt: any) => {
-   // Zoom in/out
+    // Zoom in/out
     if (evt.deltaY > 0) {
         game.currentScene.camera.zoom *= 0.9;
     } else {
@@ -44,9 +44,7 @@ game.input.pointers.primary.on('wheel', (evt: any) => {
 });
 
 // Start the game
-game.start(loader).then(() => {
-    window["StartGame"]();
-});
+game.start(loader).then(() => window["StartGame"]());
 
 window["StartGame"] = () => {
     Ui.SetUiOverlayVisibility(true);

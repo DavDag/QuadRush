@@ -1,4 +1,15 @@
-import {Actor, Collider, CollisionContact, CollisionType, Color, Engine, Side, Sprite, Timer, Vector} from "excalibur";
+import {
+    Actor,
+    Collider,
+    CollisionContact,
+    CollisionType,
+    Color,
+    Engine,
+    RotationType,
+    Side,
+    Sprite,
+    Vector
+} from "excalibur";
 import {Config} from "../config";
 import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
 import {Resources} from "./resources";
@@ -189,11 +200,15 @@ export class PlatformUnit extends Actor {
             collisionType: data.collisionType
         });
 
+        // Vanishing ability
         this.canVanish = data.willvanish;
+
+        // Moving ability
         this.canMove = data.moving !== undefined;
     }
 
     onInitialize(engine: Engine) {
+        // Add sprite
         const sprite = new Sprite({
             image: Resources.image.PaperTexture,
             sourceView: {
@@ -210,11 +225,15 @@ export class PlatformUnit extends Actor {
         });
         this.graphics.use(sprite);
 
+        // Make platform a scenery object
         if (this.pattern !== 'start' && this.pattern !== 'end') {
             const z = Config.PlatformZIndexes[Math.floor(Math.random() * Config.PlatformZIndexes.length)];
             MakeThisASceneryObject(this, z, true, true);
         }
 
+        //
+        // This enables the platform to rotate around a specific point
+        //
         this.graphics.onPreDraw = (ctx, delta) => {
             ctx.save();
 
@@ -224,7 +243,6 @@ export class PlatformUnit extends Actor {
             ctx.rotate(this.rotation);
             ctx.translate(0, -(Config.PlatformRotationHeight - this.center.y));
         }
-
         this.graphics.onPostDraw = (ctx, delta) => {
             ctx.restore();
         }
@@ -259,15 +277,19 @@ export class PlatformUnit extends Actor {
     }
 
     public hide(time: number) {
+        // Make platform stop and don't collide
         this.isStopped = true;
         this.body.collisionType = CollisionType.PreventCollision;
 
+        // Check if hide immediately
         if (time === 0) {
-            this.rotation = Math.PI / 2;
+            this.rotation = Config.PlatformHidingAngle;
             return;
         }
+
+        // Otherwise, rotate the platform using actions API
         this.actions
-            .rotateBy(-Math.PI / 2, (Math.PI / 2) / (time / 1000))
+            .rotateBy(-Config.PlatformHidingAngle, Config.PlatformHidingAngle / (time / 1000))
             .callMethod(() => {
                 // TODO: Replace this sound
                 // void Resources.Falling.play();
@@ -275,43 +297,42 @@ export class PlatformUnit extends Actor {
     }
 
     public show(time: number) {
+        // Make platform stop and don't collide
         this.isStopped = true;
         this.body.collisionType = CollisionType.PreventCollision;
 
+        // Check if show immediately
         if (time === 0) {
             this.rotation = 0;
             return;
         }
+
+        // Otherwise, rotate the platform using actions API
         this.actions
             .callMethod(() => {
                 // TODO: Replace this sound
                 // void Resources.Falling.play();
             })
-            .rotateBy(-Math.PI / 2, (Math.PI / 2) / (time / 1000))
+            .rotateBy(-Config.PlatformHidingAngle, Config.PlatformHidingAngle / (time / 1000))
             .callMethod(() => {
+                // Make platform move and collide again
                 this.isStopped = false;
                 this.body.collisionType = this.data.collisionType;
             });
     }
 
     public fall() {
-        const timer = new Timer({
-            fcn: () => {
-                this.actions
-                    .callMethod(() => {
-                        this.isStopped = true;
-                        this.body.collisionType = CollisionType.PreventCollision;
-                        // TODO: Replace this sound
-                        // void Resources.Falling.play();
-                    })
-                    .moveBy(0, Config.WindowHeight, Config.PlatformFallingSpeed)
-                    .callMethod(this.hide.bind(this, 0));
-            },
-            interval: Config.PlatformTimeBeforeFalling,
-            repeats: false,
-        });
-        this.scene.add(timer);
-        timer.start();
+        this.actions
+            .delay(Config.PlatformTimeBeforeFalling)
+            .callMethod(() => {
+                // Make platform stop and don't collide
+                this.isStopped = true;
+                this.body.collisionType = CollisionType.PreventCollision;
+                // TODO: Replace this sound
+                // void Resources.Falling.play();
+            })
+            // Animate platform falling
+            .moveBy(0, Config.WindowHeight, Config.PlatformFallingSpeed);
     }
 }
 
