@@ -4,7 +4,8 @@ import {Config} from "../../config";
 function CreateShadow(current: Graphic): Graphic {
     const shadow = current.clone();
     shadow.tint = Color.fromHex("#000000ff");
-    shadow.opacity = 0.8;
+    shadow.opacity = 0.75;
+    shadow.rotation = 0;
     return shadow;
 }
 

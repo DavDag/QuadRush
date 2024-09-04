@@ -1,7 +1,6 @@
 import {Actor, Collider, CollisionContact, CollisionType, Color, Engine, Side, Timer, Vector} from "excalibur";
 import {Config} from "../config";
 import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
-import {Resources} from "./resources";
 
 interface PlatformUnitGenOptions {
     posoffset: Vector,
@@ -195,7 +194,11 @@ export class PlatformUnit extends Actor {
 
     onInitialize(engine: Engine) {
         super.onInitialize(engine);
-        MakeThisASceneryObject(this, Config.PlatformZIndex1);
+
+        if (this.pattern !== 'start' && this.pattern !== 'end') {
+            const z = Config.PlatformZIndexes[Math.floor(Math.random() * Config.PlatformZIndexes.length)];
+            MakeThisASceneryObject(this, z);
+        }
 
         this.graphics.onPreDraw = (ctx, delta) => {
             ctx.save();
@@ -300,10 +303,6 @@ export class Platform extends Actor {
             name: 'platform.container',
             x: pos.x,
             y: pos.y,
-            width: 0,
-            height: 0,
-            color: Color.Transparent,
-            collisionType: CollisionType.PreventCollision,
         });
 
         // Add children
@@ -311,10 +310,6 @@ export class Platform extends Actor {
         for (const data of children) {
             this.addChild(new PlatformUnit(this.pattern, data));
         }
-    }
-
-    onInitialize(engine: Engine) {
-        super.onInitialize(engine);
     }
 
     public hide(time: number) {

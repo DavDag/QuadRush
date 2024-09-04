@@ -1,4 +1,4 @@
-import {Actor, Color, Engine, GraphicsGroup, ParallaxComponent, Scene, Sprite, Vector} from "excalibur";
+import {Actor, Color, Engine, ParallaxComponent, Scene, Sprite, Vector} from "excalibur";
 import {Config} from "../config";
 import {Platform} from "./platform";
 import {Resources} from "./resources";
@@ -7,6 +7,7 @@ import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
 class VulkanLayer extends Actor {
     constructor(private layer: number) {
         super({
+            name: "vulkan.layer",
             pos: Vector.Zero,
             width: Config.VulkanLayerSize,
             height: Config.VulkanLayerSize,
@@ -28,27 +29,28 @@ class VulkanLayer extends Actor {
             destSize: {
                 width: this.width,
                 height: this.height,
-            }
+            },
+            tint: [
+                Color.fromHex("#666600"),
+                Color.fromHex("#aaaa00"),
+                Color.fromHex("#ffff00"),
+            ][this.layer % 3]
         });
         this.graphics.use(sprite);
-        this.graphics.current.tint = [
-            Color.Red,
-            Color.Green,
-            Color.Blue
-        ][this.layer % 3];
         this.rotation = Math.PI / 2 * this.layer;
 
-        const p = 1 + (this.layer * 0.1);
+        const p = Math.pow(1.1, this.layer);
         this.addComponent(new ParallaxComponent(new Vector(p, p)));
-        this.z = Config.VulkanZIndexes[this.layer];
 
-        MakeThisASceneryObject(this, this.z, false);
+        const z = Config.VulkanZIndexes[this.layer];
+        MakeThisASceneryObject(this, z, false);
     }
 }
 
 class Vulkan extends Actor {
     constructor() {
         super({
+            name: "vulkan.container",
             pos: Vector.Zero
         });
     }
@@ -64,13 +66,19 @@ class Vulkan extends Actor {
 }
 
 class LavaLayer extends Actor {
+
+    private direction: number = 1;
+
     constructor(private layer: number) {
         super({
+            name: "lava.layer",
             pos: Vector.Zero,
             width: Config.LavaSize,
             height: Config.LavaSize,
             color: Color.fromHex("#ff000020"),
         });
+
+        this.direction = layer % 2 === 0 ? 1 : -1;
     }
 
     onInitialize(engine: Engine) {
@@ -87,24 +95,35 @@ class LavaLayer extends Actor {
             destSize: {
                 width: this.width,
                 height: this.height,
-            }
+            },
+            tint: [
+                Color.fromHex("#ff0000"),
+                Color.fromHex("#aa0000"),
+                Color.fromHex("#660000"),
+            ][this.layer % 3]
         });
         this.graphics.use(sprite);
-        this.graphics.current.tint = [
-            Color.fromHex("#ff0000"),
-            Color.fromHex("#aa0000"),
-            Color.fromHex("#660000"),
-        ][this.layer % 3];
-        this.z = Config.LavaZIndexes[this.layer];
         this.rotation = Math.PI / 2 * this.layer;
 
-        MakeThisASceneryObject(this, this.z, false);
+        const z = Config.LavaZIndexes[this.layer];
+        MakeThisASceneryObject(this, z, false);
+    }
+
+    onPreUpdate(engine: Engine, delta: number) {
+        // TODO: Remove and use sprite animation
+        this.pos.x += this.direction * Config.LavaSpeed * (delta / 1000);
+        if (this.pos.x > 100) {
+            this.direction = -1;
+        } else if (this.pos.x < -100) {
+            this.direction = 1;
+        }
     }
 }
 
 class Lava extends Actor {
     constructor() {
         super({
+            name: "lava.container",
             pos: Vector.Zero
         });
     }

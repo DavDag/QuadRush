@@ -1,4 +1,4 @@
-import {ImageSource, Sound, Sprite} from "excalibur";
+import {ImageFiltering, ImageSource, Sound} from "excalibur";
 // @ts-ignore
 import JumpSound from "../assets/music/jump.mp3";
 // @ts-ignore

@@ -22,14 +22,13 @@ export const Config = {
     // Graphics
     PoleWidth: 8,
     PoleHeight: 600,
-    PlatformRotationHeight: 1550,
-    ShadowOffset: new Vector(-3, -3),
-    PlayerZIndex: 1,
-    PlatformZIndex1: 1,
-    PlatformZIndex2: 1,
-    PlatformZIndex3: 1,
+    PlatformRotationHeight: 1800,
+    ShadowOffset: new Vector(-10, -10),
+    PlayerZIndex: 2,
+    PlatformZIndexes: [0, 2, 4],
     LavaSize: 4000,
-    LavaZIndexes: [1, 2, 3],
+    LavaZIndexes: [1, 3, 5],
+    LavaSpeed: 100,
     VulkanLayerSize: 3600,
     VulkanZIndexes: [-1, -2, -3]
 };
