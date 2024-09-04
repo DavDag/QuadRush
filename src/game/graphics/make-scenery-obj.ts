@@ -1,5 +1,6 @@
-import {Actor, Color, Graphic, GraphicsGroup, Rectangle, Vector} from "excalibur";
+import {Actor, Color, Graphic, GraphicsGroup, Rectangle, Sprite, Vector} from "excalibur";
 import {Config} from "../../config";
+import {Resources} from "../resources";
 
 function CreateShadow(current: Graphic): Graphic {
     // TODO: Improve shadows
@@ -16,14 +17,23 @@ function CreatePole(): Graphic {
         width: Config.PoleWidth,
         height: Config.PoleHeight,
         color: Color.fromHex("#cd9d5e"),
+        strokeColor: Color.Black,
+        lineWidth: Config.ManualBorderWidth,
     });
 }
 
-export function MakeThisASceneryObject(actor: Actor, zIndex: number, hasPole: boolean = true): void {
+export function MakeThisASceneryObject(actor: Actor, zIndex: number, hasPole: boolean = true, drawBorderOnBounds: boolean = false): void {
     const current = actor.graphics.current;
     const currentShadow = CreateShadow(current);
     const pole = CreatePole();
     const poleShadow = CreateShadow(pole);
+    const boundsBorder = new Rectangle({
+        width: actor.width,
+        height: actor.height,
+        color: Color.Transparent,
+        strokeColor: Color.Black,
+        lineWidth: Config.ManualBorderWidth,
+    });
 
     const offset = new Vector(-current.width / 2, -current.height / 2);
     const group = new GraphicsGroup({
@@ -41,11 +51,14 @@ export function MakeThisASceneryObject(actor: Actor, zIndex: number, hasPole: bo
             // },
             {
                 graphic: pole,
-                offset: offset
-                    .add(new Vector(-pole.width / 2 + current.width / 2, current.height / 2)),
+                offset: offset.add(new Vector(-pole.width / 2 + current.width / 2, current.height / 2)),
             },
             {
                 graphic: current,
+                offset: offset,
+            },
+            {
+                graphic: boundsBorder,
                 offset: offset,
             },
         ],
@@ -55,6 +68,9 @@ export function MakeThisASceneryObject(actor: Actor, zIndex: number, hasPole: bo
     actor.graphics.use(group);
     actor.z = zIndex;
 
+    if (!drawBorderOnBounds) {
+        group.members.splice(2, 1);
+    }
     if (!hasPole) {
         group.members.splice(0, 1);
     }

@@ -20,6 +20,7 @@ export const Config = {
     PlatformTimeBeforeFalling: 500,
 
     // Graphics
+    ManualBorderWidth: 5,
     PoleWidth: 8,
     PoleHeight: 600,
     PlatformRotationHeight: 1800,

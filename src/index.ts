@@ -13,8 +13,9 @@ Object.values(Resources.music).forEach(loader.addResource.bind(loader));
 const game = new Engine({
     canvasElementId: 'game',
     fixedUpdateFps: 60,
-    backgroundColor: Color.fromHex('#5fcde4'),
+    backgroundColor: Color.fromHex('#000000'),
     displayMode: DisplayMode.Fixed,
+    pixelArt: true,
 });
 
 // Scenes

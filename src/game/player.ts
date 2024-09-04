@@ -52,7 +52,7 @@ export class Player extends Actor {
         });
         this.graphics.use(sprite);
 
-        MakeThisASceneryObject(this, Config.PlayerZIndex);
+        MakeThisASceneryObject(this, Config.PlayerZIndex, true, true);
     }
 
     onPreUpdate(engine: Engine, delta: number) {

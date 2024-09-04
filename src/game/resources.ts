@@ -17,15 +17,12 @@ import BgLayer1Image from "../assets/sprite/bg_layer1.png";
 import LavaLayer1Image from "../assets/sprite/lava_layer1.png";
 // @ts-ignore
 import PaperTextureImage from "../assets/sprite/paper_texture.png";
-// @ts-ignore
-import WoodTextureImage from "../assets/sprite/wood_texture.png";
 
 export const Resources = {
     image: {
         BgLayer1: new ImageSource(BgLayer1Image),
         LavalLayer1: new ImageSource(LavaLayer1Image),
         PaperTexture: new ImageSource(PaperTextureImage),
-        WoodTexture: new ImageSource(WoodTextureImage),
     },
     music: {
         Jump: new Sound(JumpSound),

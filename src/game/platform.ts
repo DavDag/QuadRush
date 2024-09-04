@@ -212,7 +212,7 @@ export class PlatformUnit extends Actor {
 
         if (this.pattern !== 'start' && this.pattern !== 'end') {
             const z = Config.PlatformZIndexes[Math.floor(Math.random() * Config.PlatformZIndexes.length)];
-            MakeThisASceneryObject(this, z);
+            MakeThisASceneryObject(this, z, true, true);
         }
 
         this.graphics.onPreDraw = (ctx, delta) => {
