@@ -55,7 +55,7 @@ export const Config = {
 
     // Graphics: Platforms
     PlatformRotationHeight: 1800,
-    PlatformZIndexes: [0, 2, 4],
+    PlatformZIndexes: [1, 3, 5],
     PlatformColors: {
         "base": Color.DarkGray,
         "falling.1": Color.LightGray,
@@ -63,25 +63,26 @@ export const Config = {
         "falling.2.inv": Color.Orange,
         "falling.3": Color.LightGray,
         "falling.4": Color.LightGray,
-        "start": Color.fromHex("#00000020"),
-        "end": Color.fromHex("#00000020"),
     },
 
     // Graphics: Player
-    PlayerZIndex: 2,
+    PlayerZIndex: 3,
+    PlayerWidth: 50,
+    PlayerHeight: 50,
     PlayerColor: Color.White,
 
     // Graphics: Lava
+    LavaZIndexes: [2, 4, 6],
     LavaSize: 4000,
     LavaColors: [
         Color.fromHex("#ff0000"),
         Color.fromHex("#aa0000"),
         Color.fromHex("#660000"),
     ],
-    LavaZIndexes: [1, 3, 5],
     LavaSpeed: [100, 60, 80],
 
     // Graphics: Vulkan
+    VulkanZIndexes: [-11, -12, -13, -14, -15],
     VulkanLayerSize: 3600,
     VulkanColors: [
         Color.fromHex("#666600"),
@@ -90,5 +91,10 @@ export const Config = {
         Color.fromHex("#cccc00"),
         Color.fromHex("#ffff00"),
     ],
-    VulkanZIndexes: [-1, -2, -3, -4, -5]
+
+    // Graphics: Portal
+    PortalZIndex: 0,
+    PortalWidth: 200,
+    PortalHeight: 200,
+    PortalColor: Color.fromHex("#00000020"),
 };

@@ -34,11 +34,12 @@ export class GameScene extends Scene {
         this.add(this.scoretimer);
 
         // Add environment
-        this.environment = new Environment(this);
+        this.environment = new Environment();
+        this.add(this.environment);
 
         // Add player & camera
         this.player = new Player(this.onDie.bind(this), this.onWin.bind(this));
-        this.player.pos = new Vector(-Config.LevelLength / 2 + 2300 + 200, Config.PlatformHeight - 200);
+        this.player.pos = new Vector(-Config.LevelLength / 2 + 200, Config.PlatformHeight - 200);
         this.add(this.player);
         this.camera.strategy.elasticToActor(this.player, 0.1, 0.1);
 

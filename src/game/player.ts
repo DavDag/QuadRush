@@ -26,8 +26,8 @@ export class Player extends Actor {
     constructor(private OnDie: () => void, private OnWin: () => void) {
         super({
             name: 'player',
-            width: 50,
-            height: 50,
+            width: Config.PlayerWidth,
+            height: Config.PlayerHeight,
             color: Color.Violet,
             collisionType: CollisionType.Active,
             collider: Shape.Box(50, 50),
@@ -119,7 +119,7 @@ export class Player extends Actor {
         if (this.isPaused) return;
 
         // Check for collision with end platform (winning condition)
-        if (other.owner.name === 'platform' && (other.owner as PlatformUnit).pattern === 'end') {
+        if (other.owner.name === 'portal.end') {
             this.isPaused = true;
             this.vel = new Vector(0, 0);
             this.OnWin();

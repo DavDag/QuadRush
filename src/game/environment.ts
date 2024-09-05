@@ -146,21 +146,48 @@ class Lava extends Actor {
     }
 }
 
-export class Environment {
+class Portal extends Actor {
+    constructor(pos: Vector, isStart: boolean) {
+        super({
+            name: "portal" + (isStart ? ".start" : ".end"),
+            pos: pos,
+            width: Config.PortalWidth,
+            height: Config.PortalHeight,
+            color: Config.PortalColor,
+            anchor: (isStart ? Vector.Down : Vector.One),
+            collisionType: CollisionType.Passive,
+        });
+    }
+}
 
+export class Environment extends Actor {
+
+    private portals: Portal[] = [];
     private lava: Lava;
     private vulkan: Vulkan;
 
-    constructor(scene: Scene) {
-        // Environment
-        this.lava = new Lava();
-        this.vulkan = new Vulkan();
-        scene.add(this.lava);
-        scene.add(this.vulkan);
+    constructor() {
+        super({
+            name: "environment",
+            pos: Vector.Zero,
+        });
+    }
 
-        // Start and end platforms
-        scene.add(new Platform("start", 0, new Vector(-Config.LevelLength / 2, Config.LevelLength / 2)));
-        scene.add(new Platform("end", 0, new Vector(Config.LevelLength / 2, Config.LevelLength / 2)));
+    onInitialize(engine: Engine) {
+        // Portals (triggers)
+        this.portals = [
+            new Portal(new Vector(-Config.LevelLength / 2, Config.LevelLength / 2), true),
+            new Portal(new Vector(+Config.LevelLength / 2, Config.LevelLength / 2), false),
+        ];
+        this.portals.forEach(this.addChild.bind(this));
+
+        // Lava (fg)
+        this.lava = new Lava();
+        this.addChild(this.lava);
+
+        // Vulkan (bg)
+        this.vulkan = new Vulkan();
+        this.addChild(this.vulkan);
     }
 
     public rotateToLevel(level: number) {

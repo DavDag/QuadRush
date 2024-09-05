@@ -5,7 +5,6 @@ import {
     CollisionType,
     Color,
     Engine,
-    RotationType,
     Side,
     Sprite,
     Vector
