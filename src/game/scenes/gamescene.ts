@@ -39,7 +39,7 @@ export class GameScene extends Scene {
 
         // Add player & camera
         this.player = new Player(this.onDie.bind(this), this.onWin.bind(this));
-        this.player.pos = new Vector(-Config.LevelLength / 2 + 2300 + 200, Config.PlatformHeight - 200);
+        this.player.pos = new Vector(-Config.LevelLength / 2 + 200, Config.PlatformHeight - 200);
         this.add(this.player);
         this.camera.strategy.elasticToActor(this.player, 0.1, 0.1);
 
@@ -97,16 +97,16 @@ export class GameScene extends Scene {
 
         // Platforms
         this.platforms = [
-            new Platform("base", this.level, new Vector(-Config.LevelLength / 2 + 200, Config.PlatformHeight)),
-            new Platform("base", this.level, new Vector(+Config.LevelLength / 2 - 200, Config.PlatformHeight)),
+            new Platform("safe", this.level, new Vector(-Config.LevelLength / 2 + 200, Config.PlatformHeight)),
+            new Platform("safe", this.level, new Vector(+Config.LevelLength / 2 - 200, Config.PlatformHeight)),
         ];
         for (let i = 0; i < 4; i++) {
             const types: PlatformPatternType[] = [
-                "falling.1",
-                "falling.2",
-                "falling.2.inv",
-                // "falling.3",
-                // "falling.4"
+                "simple",
+                "downwards",
+                "upwards",
+                "reverseT",
+                "tunnel"
             ];
             const type: PlatformPatternType = types[Math.floor(Math.random() * types.length)];
             const ppos = new Vector(-Config.LevelLength / 2 + 400 + 250 + 500 * i, Config.PlatformHeight);

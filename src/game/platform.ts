@@ -79,15 +79,15 @@ interface PlatformUnitGenOptions {
     moving?: PlatformUnitGenMovingOptions,
 }
 
-export const PLATFORM_PATTERNS: { [key: string]: PlatformUnitGenOptions[] } = {
-    "base": [
+export const PLATFORM_PATTERNS = {
+    "safe": [
         {
             offset: new Vector(0, 0),
             width: 400,
             height: 50,
         }
     ],
-    "falling.1": [
+    "simple": [
         {
             offset: new Vector(0, 0),
             width: {
@@ -101,7 +101,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PlatformUnitGenOptions[] } = {
             },
         },
     ],
-    "falling.2": [
+    "downwards": [
         {
             offset: new Vector(-125, 0),
             width: {
@@ -149,7 +149,7 @@ export const PLATFORM_PATTERNS: { [key: string]: PlatformUnitGenOptions[] } = {
             },
         },
     ],
-    "falling.2.inv": [
+    "upwards": [
         {
             offset: new Vector(-125, -100),
             width: {
@@ -197,46 +197,78 @@ export const PLATFORM_PATTERNS: { [key: string]: PlatformUnitGenOptions[] } = {
             },
         },
     ],
-    // "falling.3": [
-    //     {
-    //         offset: new Vector(-125, 0),
-    //         width: {
-    //             baseWidth: 200,
-    //             widthIncreaseByLevel: -50,
-    //             minWidth: 25,
-    //         },
-    //         height: 50,
-    //         vanishing: {
-    //             vanishChanceIncreaseByLevel: 0.05,
-    //         },
-    //     },
-    //     {
-    //         offset: new Vector(0, -75),
-    //         baseWidth: 50,
-    //         baseHeight: Math.min(150, 25 + level * 50),
-    //         willVanish: (Math.random() * 30 < level),
-    //     },
-    //     {
-    //         offset: new Vector(125, 0),
-    //         baseWidth: Math.max(25, 200 - level * 50),
-    //         baseHeight: 50,
-    //         willVanish: (Math.random() * 30 < level),
-    //     },
-    // ],
-    // "falling.4": [
-    //     {
-    //         offset: new Vector(0, -200),
-    //         baseWidth: Math.max(50, 250 - level * 50),
-    //         baseHeight: Math.min(150, 25 + level * 50),
-    //         willVanish: (Math.random() * 30 < level),
-    //     },
-    //     {
-    //         offset: new Vector(0, 25),
-    //         baseWidth: Math.max(50, 250 - level * 50),
-    //         baseHeight: Math.min(150, 25 + level * 50),
-    //         willVanish: (Math.random() * 30 < level),
-    //     },
-    // ],
+    "reverseT": [
+        {
+            offset: new Vector(-125, 0),
+            width: {
+                baseWidth: 200,
+                widthIncreaseByLevel: -50,
+                minWidth: 25,
+            },
+            height: 50,
+            vanishing: {
+                vanishChanceIncreaseByLevel: 0.05,
+            },
+        },
+        {
+            offset: new Vector(0, -75),
+            width: 50,
+            height: {
+                baseHeight: 25,
+                heightIncreaseByLevel: 50,
+                maxHeight: 150,
+            },
+            vanishing: {
+                vanishChanceIncreaseByLevel: 0.05,
+            },
+        },
+        {
+            offset: new Vector(125, 0),
+            width: {
+                baseWidth: 200,
+                widthIncreaseByLevel: -50,
+                minWidth: 25,
+            },
+            height: 50,
+            vanishing: {
+                vanishChanceIncreaseByLevel: 0.05,
+            },
+        },
+    ],
+    "tunnel": [
+        {
+            offset: new Vector(0, -200),
+            width: {
+                baseWidth: 250,
+                widthIncreaseByLevel: -50,
+                minWidth: 50,
+            },
+            height: {
+                baseHeight: 25,
+                heightIncreaseByLevel: 50,
+                maxHeight: 150,
+            },
+            vanishing: {
+                vanishChanceIncreaseByLevel: 0.05,
+            },
+        },
+        {
+            offset: new Vector(0, 25),
+            width: {
+                baseWidth: 250,
+                widthIncreaseByLevel: -50,
+                minWidth: 50,
+            },
+            height: {
+                baseHeight: 25,
+                heightIncreaseByLevel: 50,
+                maxHeight: 150,
+            },
+            vanishing: {
+                vanishChanceIncreaseByLevel: 0.05,
+            },
+        },
+    ],
 };
 
 export type PlatformPatternType = keyof typeof PLATFORM_PATTERNS;
@@ -339,10 +371,8 @@ export class PlatformUnit extends Actor {
         this.graphics.use(sprite);
 
         // Make platform a scenery object
-        if (this.pattern !== 'start' && this.pattern !== 'end') {
-            const z = Config.PlatformZIndexes[Math.floor(Math.random() * Config.PlatformZIndexes.length)];
-            MakeThisASceneryObject(this, z, true, true);
-        }
+        const z = Config.PlatformZIndexes[Math.floor(Math.random() * Config.PlatformZIndexes.length)];
+        MakeThisASceneryObject(this, z, true, true);
 
         //
         // This enables the platform to rotate around a specific point
