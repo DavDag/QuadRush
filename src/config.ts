@@ -20,7 +20,7 @@ export const Config = {
     ScoreTimerInterval: 100,
 
     // Game: Feedback
-    TimeThresholdForClose: 0.75,
+    TimeThresholdForClose: 0.8,
     LevelChangeDuration: 1500,
     LevelChangeAnimInterval: 10,
     PlatformHidingAngle: Math.PI / 2,
@@ -40,6 +40,9 @@ export const Config = {
     CameraMaxZoom: 1.25,
     CameraStartZoom: 0.75,
     CameraZoomIncrement: 0.025,
+    TimeLimitBase: 30000,
+    TimeLimitIncrease: -1000,
+    TimeLimitBaseMin: 10000,
 
     //
     // Graphics
@@ -56,14 +59,17 @@ export const Config = {
     // Graphics: Platforms
     PlatformRotationHeight: 1800,
     PlatformZIndexes: [1, 3, 5],
-    PlatformColors: {
-        "base": Color.DarkGray,
-        "falling.1": Color.LightGray,
-        "falling.2": Color.Orange,
-        "falling.2.inv": Color.Orange,
-        "falling.3": Color.LightGray,
-        "falling.4": Color.LightGray,
-    },
+    PlatformColors: [
+        Color.fromHex("#ffe0e0"),
+        Color.fromHex("#dccaca"),
+        Color.fromHex("#c3b4b4"),
+        Color.fromHex("#aa9e9e"),
+        Color.fromHex("#918888"),
+        Color.fromHex("#787272"),
+        Color.fromHex("#5f5c5c"),
+        Color.fromHex("#464444"),
+        Color.fromHex("#2d2c2c"),
+    ],
 
     // Graphics: Player
     PlayerZIndex: 3,

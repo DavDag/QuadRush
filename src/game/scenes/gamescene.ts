@@ -16,14 +16,14 @@ export class GameScene extends Scene {
 
     private wasClose = false;
     private timerunning = 0;
-    private timelimit = 30;
+    private timelimit = Config.TimeLimitBase;
     private scoretimer: Timer;
     private platforms: Platform[] = [];
 
     onInitialize(engine: Engine) {
         Ui.UpdateScore(this.score);
         Ui.UpdateTime(this.timerunning, false);
-        Ui.UpdateTimeLimit(this.timelimit);
+        Ui.UpdateTimeLimit(this.timelimit / 1000);
 
         // Add score timer
         this.scoretimer = new Timer({
@@ -39,7 +39,7 @@ export class GameScene extends Scene {
 
         // Add player & camera
         this.player = new Player(this.onDie.bind(this), this.onWin.bind(this));
-        this.player.pos = new Vector(-Config.LevelLength / 2 + 200, Config.PlatformHeight - 200);
+        this.player.pos = new Vector(-Config.LevelLength / 2 + 2300 + 200, Config.PlatformHeight - 200);
         this.add(this.player);
         this.camera.strategy.elasticToActor(this.player, 0.1, 0.1);
 
@@ -78,7 +78,7 @@ export class GameScene extends Scene {
         void Resources.music.LevelComplete.play(Config.volume);
 
         // Stop the timer
-        this.score += this.timerunning * (this.level + 1);
+        this.score += (this.timelimit - this.timerunning) * (this.level + 1);
         Ui.UpdateScore(this.score);
         Leaderboard.SubmitScore(this.score)
             .then(() => {
@@ -105,8 +105,8 @@ export class GameScene extends Scene {
                 "falling.1",
                 "falling.2",
                 "falling.2.inv",
-                "falling.3",
-                "falling.4"
+                // "falling.3",
+                // "falling.4"
             ];
             const type: PlatformPatternType = types[Math.floor(Math.random() * types.length)];
             const ppos = new Vector(-Config.LevelLength / 2 + 400 + 250 + 500 * i, Config.PlatformHeight);
@@ -118,11 +118,11 @@ export class GameScene extends Scene {
     private startScene() {
         this.wasClose = false;
         this.timerunning = 0;
-        this.timelimit = Math.max(5, 30 - this.level / 2);
+        this.timelimit = Math.max(Config.TimeLimitBaseMin, Config.TimeLimitBase + Config.TimeLimitIncrease * this.level);
+        Ui.UpdateTimeLimit(this.timelimit / 1000);
         this.player.isPaused = false;
         this.scoretimer.reset();
         this.scoretimer.start();
-        Ui.UpdateTimeLimit(this.timelimit);
     }
 
     private animateLevelComplete() {
@@ -191,9 +191,6 @@ export class GameScene extends Scene {
         // Restore camera rotation (reverse)
         this.camera.rotation = -rot;
 
-        // Set platforms to invisible
-        this.platforms.forEach((p) => p.hide(0));
-
         // Animate platforms coming back
         this.platforms.forEach((p) => p.show(Config.LevelChangeDuration / 2));
 
@@ -206,9 +203,8 @@ export class GameScene extends Scene {
         this.timerunning += Config.ScoreTimerInterval;
 
         // Update UI
-        const time = this.timerunning / 1000;
-        const close = time >= (this.timelimit * Config.TimeThresholdForClose); // only 25% time left
-        Ui.UpdateTime(time, close);
+        const close = this.timerunning >= (this.timelimit * Config.TimeThresholdForClose);
+        Ui.UpdateTime(this.timerunning / 1000, close);
 
         // Play danger sound (once)
         if (close && !this.wasClose) {
@@ -217,7 +213,7 @@ export class GameScene extends Scene {
         }
 
         // Check if time is up
-        if (time >= this.timelimit) {
+        if (this.timerunning >= this.timelimit) {
             this.player.die();
         }
     }

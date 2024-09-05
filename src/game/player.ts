@@ -132,8 +132,7 @@ export class Player extends Actor {
         }
 
         // Check for collision with ground (reset jumping ability)
-        if (other.owner.name === 'platform' && (other.owner as PlatformUnit).pattern !== 'start'
-            && side === Side.Bottom) {
+        if (other.owner.name === 'platform' && side === Side.Bottom) {
             this.onGround = true;
         }
     }

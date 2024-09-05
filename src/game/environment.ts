@@ -1,6 +1,5 @@
-import {Actor, CollisionType, Color, Engine, ParallaxComponent, Scene, Shape, Sprite, Vector} from "excalibur";
+import {Actor, CollisionType, Color, Engine, ParallaxComponent, Shape, Sprite, Vector} from "excalibur";
 import {Config} from "../config";
-import {Platform} from "./platform";
 import {Resources} from "./resources";
 import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
 

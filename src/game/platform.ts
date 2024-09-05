@@ -1,186 +1,323 @@
-import {
-    Actor,
-    Collider,
-    CollisionContact,
-    CollisionType,
-    Color,
-    Engine,
-    Side,
-    Sprite,
-    Vector
-} from "excalibur";
+import {Actor, Collider, CollisionContact, CollisionType, Engine, Side, Sprite, Vector} from "excalibur";
 import {Config} from "../config";
 import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
 import {Resources} from "./resources";
 
-interface PlatformUnitGenOptions {
-    posoffset: Vector,
-    width: number,
-    height: number,
-    collisionType: CollisionType,
-    willvanish?: boolean,
-    moving?: {
-        startoff: number,
-        endoff: number,
-        duration: number,
-    },
+//
+// Width is calculated as follows:
+//
+// width = baseWidth + widthIncreaseByLevel * level
+// width = max(minWidth, min(maxWidth, width))
+//
+interface PlatformUnitGetWidthOptions {
+    baseWidth: number,
+    widthIncreaseByLevel: number,
+    minWidth?: number,
+    maxWidth?: number,
 }
 
-export const PLATFORM_PATTERNS: { [key: string]: ((level: number) => PlatformUnitGenOptions[]) } = {
-    "base": (_: number) => ([
+//
+// Height is calculated as follows:
+//
+// height = baseHeight + heightIncreaseByLevel * level
+// height = max(minHeight, min(maxHeight, height))
+//
+interface PlatformUnitGetHeightOptions {
+    baseHeight: number,
+    heightIncreaseByLevel: number,
+    minHeight?: number,
+    maxHeight?: number,
+}
+
+//
+// Vanishing options
+//
+// chance = baseVanishChance + vanishChanceIncreaseByLevel * level
+// chance = min(max(0.0, chance), 1.0)
+//
+interface PlatformUnitGenVanishingOptions {
+    baseVanishChance?: number,
+    vanishChanceIncreaseByLevel?: number,
+}
+
+//
+// Moving options (single axis)
+//
+// d = baseDuration + durationIncreaseByLevel * level
+// d = max(minDuration, min(maxDuration, d))
+//
+// f = currentMoveTime / d
+// pos = startingPos + offset.start + (offset.end - offset.start) * f
+//
+interface PlatformUnitGenMovingSingleAxisOptions {
+    offset: {
+        start: number,
+        end: number,
+    },
+    baseDuration: number,
+    durationIncreaseByLevel?: number,
+    minDuration?: number,
+    maxDuration?: number,
+}
+
+//
+// Moving options
+//
+// x: moving options for x-axis
+// y: moving options for y-axis
+//
+interface PlatformUnitGenMovingOptions {
+    x?: PlatformUnitGenMovingSingleAxisOptions,
+    y?: PlatformUnitGenMovingSingleAxisOptions,
+}
+
+interface PlatformUnitGenOptions {
+    offset: Vector,
+    width: number | PlatformUnitGetWidthOptions,
+    height: number | PlatformUnitGetHeightOptions,
+    vanishing?: PlatformUnitGenVanishingOptions,
+    moving?: PlatformUnitGenMovingOptions,
+}
+
+export const PLATFORM_PATTERNS: { [key: string]: PlatformUnitGenOptions[] } = {
+    "base": [
         {
-            posoffset: new Vector(0, 0),
+            offset: new Vector(0, 0),
             width: 400,
             height: 50,
-            collisionType: CollisionType.Fixed,
-        },
-    ]),
-    "falling.1": (level: number) => ([
-        {
-            posoffset: new Vector(0, 0),
-            width: Math.max(50, 500 - level * 50),
-            height: 50,
-            collisionType: CollisionType.Fixed,
-            willvanish: (Math.random() * 30 < level),
-        },
-    ]),
-    "falling.2": (level: number) => ([
-        {
-            posoffset: new Vector(-125, 0),
-            width: Math.max(50, 250 - level * 50),
-            height: 50,
-            collisionType: CollisionType.Fixed,
-            willvanish: (Math.random() * 30 < level),
-            moving: {
-                startoff: 0,
-                endoff: -100,
-                duration: Math.max(500, 3000 - level * 500),
-            },
-        },
-        {
-            posoffset: new Vector(+125, -100),
-            width: Math.max(50, 250 - level * 50),
-            height: 50,
-            collisionType: CollisionType.Fixed,
-            willvanish: (Math.random() * 30 < level),
-            moving: {
-                startoff: 0,
-                endoff: +100,
-                duration: Math.max(500, 3000 - level * 500),
-            },
-        },
-    ]),
-    "falling.2.inv": (level: number) => ([
-        {
-            posoffset: new Vector(-125, -100),
-            width: Math.max(50, 250 - level * 50),
-            height: 50,
-            collisionType: CollisionType.Fixed,
-            willvanish: (Math.random() * 30 < level),
-            moving: {
-                startoff: 0,
-                endoff: +100,
-                duration: Math.max(500, 3000 - level * 500),
-            },
-        },
-        {
-            posoffset: new Vector(+125, 0),
-            width: Math.max(50, 250 - level * 50),
-            height: 50,
-            collisionType: CollisionType.Fixed,
-            willvanish: (Math.random() * 30 < level),
-            moving: {
-                startoff: 0,
-                endoff: -100,
-                duration: Math.max(500, 3000 - level * 500),
-            },
-        },
-    ]),
-    "falling.3": (level: number) => ([
-        {
-            posoffset: new Vector(-125, 0),
-            width: Math.max(25, 200 - level * 50),
-            height: 50,
-            collisionType: CollisionType.Fixed,
-            willvanish: (Math.random() * 30 < level),
-        },
-        {
-            posoffset: new Vector(0, -75),
-            width: 50,
-            height: Math.min(150, 25 + level * 50),
-            collisionType: CollisionType.Fixed,
-            willvanish: (Math.random() * 30 < level),
-        },
-        {
-            posoffset: new Vector(125, 0),
-            width: Math.max(25, 200 - level * 50),
-            height: 50,
-            collisionType: CollisionType.Fixed,
-            willvanish: (Math.random() * 30 < level),
-        },
-    ]),
-    "falling.4": (level: number) => ([
-        {
-            posoffset: new Vector(0, -200),
-            width: Math.max(50, 250 - level * 50),
-            height: Math.min(150, 25 + level * 50),
-            collisionType: CollisionType.Fixed,
-            willvanish: (Math.random() * 30 < level),
-        },
-        {
-            posoffset: new Vector(0, 25),
-            width: Math.max(50, 250 - level * 50),
-            height: Math.min(150, 25 + level * 50),
-            collisionType: CollisionType.Fixed,
-            willvanish: (Math.random() * 30 < level),
-        },
-    ]),
-    "start": (_: number) => ([
-        {
-            posoffset: new Vector(100, -100),
-            width: 200,
-            height: 200,
-            collisionType: CollisionType.Passive,
         }
-    ]),
-    "end": (_: number) => ([
+    ],
+    "falling.1": [
         {
-            posoffset: new Vector(-100, -100),
-            width: 200,
-            height: 200,
-            collisionType: CollisionType.Passive,
-        }
-    ]),
+            offset: new Vector(0, 0),
+            width: {
+                baseWidth: 500,
+                widthIncreaseByLevel: -50,
+                minWidth: 50,
+            },
+            height: 50,
+            vanishing: {
+                vanishChanceIncreaseByLevel: 0.05,
+            },
+        },
+    ],
+    "falling.2": [
+        {
+            offset: new Vector(-125, 0),
+            width: {
+                baseWidth: 250,
+                widthIncreaseByLevel: -25,
+                minWidth: 50,
+            },
+            height: 50,
+            vanishing: {
+                vanishChanceIncreaseByLevel: 0.05,
+            },
+            moving: {
+                y: {
+                    offset: {
+                        start: 0,
+                        end: -100,
+                    },
+                    baseDuration: 3000,
+                    durationIncreaseByLevel: -500,
+                    minDuration: 500,
+                },
+            },
+        },
+        {
+            offset: new Vector(+125, -100),
+            width: {
+                baseWidth: 250,
+                widthIncreaseByLevel: -25,
+                minWidth: 50,
+            },
+            height: 50,
+            vanishing: {
+                vanishChanceIncreaseByLevel: 0.05,
+            },
+            moving: {
+                y: {
+                    offset: {
+                        start: 0,
+                        end: +100,
+                    },
+                    baseDuration: 3000,
+                    durationIncreaseByLevel: -500,
+                    minDuration: 500,
+                },
+            },
+        },
+    ],
+    "falling.2.inv": [
+        {
+            offset: new Vector(-125, -100),
+            width: {
+                baseWidth: 250,
+                widthIncreaseByLevel: -25,
+                minWidth: 50,
+            },
+            height: 50,
+            vanishing: {
+                vanishChanceIncreaseByLevel: 0.05,
+            },
+            moving: {
+                y: {
+                    offset: {
+                        start: 0,
+                        end: +100,
+                    },
+                    baseDuration: 3000,
+                    durationIncreaseByLevel: -500,
+                    minDuration: 500,
+                },
+            },
+        },
+        {
+            offset: new Vector(+125, 0),
+            width: {
+                baseWidth: 250,
+                widthIncreaseByLevel: -25,
+                minWidth: 50,
+            },
+            height: 50,
+            vanishing: {
+                vanishChanceIncreaseByLevel: 0.05,
+            },
+            moving: {
+                y: {
+                    offset: {
+                        start: 0,
+                        end: -100,
+                    },
+                    baseDuration: 3000,
+                    durationIncreaseByLevel: -500,
+                    minDuration: 500,
+                },
+            },
+        },
+    ],
+    // "falling.3": [
+    //     {
+    //         offset: new Vector(-125, 0),
+    //         width: {
+    //             baseWidth: 200,
+    //             widthIncreaseByLevel: -50,
+    //             minWidth: 25,
+    //         },
+    //         height: 50,
+    //         vanishing: {
+    //             vanishChanceIncreaseByLevel: 0.05,
+    //         },
+    //     },
+    //     {
+    //         offset: new Vector(0, -75),
+    //         baseWidth: 50,
+    //         baseHeight: Math.min(150, 25 + level * 50),
+    //         willVanish: (Math.random() * 30 < level),
+    //     },
+    //     {
+    //         offset: new Vector(125, 0),
+    //         baseWidth: Math.max(25, 200 - level * 50),
+    //         baseHeight: 50,
+    //         willVanish: (Math.random() * 30 < level),
+    //     },
+    // ],
+    // "falling.4": [
+    //     {
+    //         offset: new Vector(0, -200),
+    //         baseWidth: Math.max(50, 250 - level * 50),
+    //         baseHeight: Math.min(150, 25 + level * 50),
+    //         willVanish: (Math.random() * 30 < level),
+    //     },
+    //     {
+    //         offset: new Vector(0, 25),
+    //         baseWidth: Math.max(50, 250 - level * 50),
+    //         baseHeight: Math.min(150, 25 + level * 50),
+    //         willVanish: (Math.random() * 30 < level),
+    //     },
+    // ],
 };
 
 export type PlatformPatternType = keyof typeof PLATFORM_PATTERNS;
 
 export class PlatformUnit extends Actor {
 
-    private canVanish = false;
-    private canMove = false;
+    private static GetWidth(options: number | PlatformUnitGetWidthOptions, level: number): number {
+        switch (typeof options) {
+            case 'number':
+                return options;
+            case 'object':
+                const w = options as PlatformUnitGetWidthOptions;
+                const width = w.baseWidth + w.widthIncreaseByLevel * level;
+                return Math.min(w.maxWidth || w.baseWidth, Math.max(w.minWidth || w.baseWidth, width));
+            default:
+                return 0;
+        }
+    }
+
+    private static GetHeight(options: number | PlatformUnitGetHeightOptions, level: number): number {
+        switch (typeof options) {
+            case 'number':
+                return options;
+            case 'object':
+                const h = options as PlatformUnitGetHeightOptions;
+                const height = h.baseHeight + h.heightIncreaseByLevel * level;
+                return Math.min(h.maxHeight || h.baseHeight, Math.max(h.minHeight || h.baseHeight, height));
+            default:
+                return 0;
+        }
+    }
+
+    private static GetVanishingChance(options: PlatformUnitGenVanishingOptions, level: number): number {
+        if (options === undefined) return 0;
+        const chance = (options.baseVanishChance || 0) + (options.vanishChanceIncreaseByLevel || 0) * level;
+        return Math.min(1.0, Math.max(0.0, chance));
+    }
+
+    private static GetMovingData(options: PlatformUnitGenMovingSingleAxisOptions, level: number) {
+        if (options === undefined) return undefined;
+        const d = options.baseDuration + (options.durationIncreaseByLevel || 0) * level;
+        return {
+            offset: options.offset,
+            duration: Math.min(options.maxDuration || options.baseDuration, Math.max(options.minDuration || options.baseDuration, d)),
+        };
+    }
+
     private isStopped = false;
 
+    private readonly vanish: boolean = false;
     private isVanishing = false;
-    private currentMoveDirection = 1;
-    private currentMoveTime = 0;
 
-    constructor(public readonly pattern: PlatformPatternType, private data: PlatformUnitGenOptions) {
+    private readonly startingPos: Vector = Vector.Zero;
+    private readonly moveX?: { offset: { start: number, end: number }, duration: number } = undefined;
+    private readonly moveY?: { offset: { start: number, end: number }, duration: number } = undefined;
+    private currentMoveDirectionX = 1;
+    private currentMoveDirectionY = 1;
+    private currentMoveTimeX = 0;
+    private currentMoveTimeY = 0;
+
+    constructor(
+        public readonly pattern: PlatformPatternType,
+        data: PlatformUnitGenOptions,
+        level: number
+    ) {
         super({
             name: 'platform',
-            x: data.posoffset.x,
-            y: data.posoffset.y,
-            width: data.width,
-            height: data.height,
-            color: Config.PlatformColors[pattern] || Color.Violet,
-            collisionType: data.collisionType
+            pos: data.offset,
+            width: PlatformUnit.GetWidth(data.width, level),
+            height: PlatformUnit.GetHeight(data.height, level),
+            color: Config.PlatformColors[Math.floor(Math.random() * Config.PlatformColors.length)],
+            collisionType: CollisionType.Fixed,
         });
 
         // Vanishing ability
-        this.canVanish = data.willvanish;
+        this.vanish = Math.random() < PlatformUnit.GetVanishingChance(data.vanishing, level);
 
         // Moving ability
-        this.canMove = data.moving !== undefined;
+        this.startingPos = this.pos.clone();
+        this.moveX = PlatformUnit.GetMovingData(data.moving?.x, level);
+        this.moveY = PlatformUnit.GetMovingData(data.moving?.y, level);
     }
 
     onInitialize(engine: Engine) {
@@ -225,25 +362,43 @@ export class PlatformUnit extends Actor {
     }
 
     onPostUpdate(engine: Engine, delta: number) {
-        if (!this.canMove || this.isStopped) return;
+        if (this.isStopped) return;
 
         // Move platform up and down
-        this.currentMoveTime += delta * this.currentMoveDirection;
-        if (this.currentMoveTime >= this.data.moving.duration) {
-            this.currentMoveTime -= delta;
-            this.currentMoveDirection = -1;
-        } else if (this.currentMoveTime < 0) {
-            this.currentMoveTime += delta;
-            this.currentMoveDirection = +1;
+        if (this.moveY !== undefined) {
+            this.currentMoveTimeY += delta * this.currentMoveDirectionY;
+            if (this.currentMoveTimeY >= this.moveY.duration) {
+                this.currentMoveTimeY -= delta;
+                this.currentMoveDirectionY = -1;
+            } else if (this.currentMoveTimeY < 0) {
+                this.currentMoveTimeY += delta;
+                this.currentMoveDirectionY = +1;
+            }
+
+            const f = (this.currentMoveTimeY / this.moveY.duration);
+            const off = (this.moveY.offset.end - this.moveY.offset.start) * f;
+            this.pos.y = this.startingPos.y + this.moveY.offset.start + off;
         }
 
-        const f = (this.currentMoveTime / this.data.moving.duration);
-        const off = (this.data.moving.endoff - this.data.moving.startoff) * f;
-        this.pos.y = this.data.posoffset.y + this.data.moving.startoff + off;
+        // Move platform left and right
+        if (this.moveX !== undefined) {
+            this.currentMoveTimeX += delta * this.currentMoveDirectionX;
+            if (this.currentMoveTimeX >= this.moveX.duration) {
+                this.currentMoveTimeX -= delta;
+                this.currentMoveDirectionX = -1;
+            } else if (this.currentMoveTimeX < 0) {
+                this.currentMoveTimeX += delta;
+                this.currentMoveDirectionX = +1;
+            }
+
+            const f = (this.currentMoveTimeX / this.moveX.duration);
+            const off = (this.moveX.offset.end - this.moveX.offset.start) * f;
+            this.pos.x = this.startingPos.x + this.moveX.offset.start + off;
+        }
     }
 
     onCollisionStart(self: Collider, other: Collider, side: Side, contact: CollisionContact) {
-        if (!this.canVanish || this.isStopped) return;
+        if (!this.vanish || this.isStopped) return;
 
         // Vanish if player touches
         if (other.owner.name === 'player' && !this.isVanishing) {
@@ -259,13 +414,13 @@ export class PlatformUnit extends Actor {
 
         // Check if hide immediately
         if (time === 0) {
-            this.rotation = Config.PlatformHidingAngle;
+            this.rotation = -Config.PlatformHidingAngle;
             return;
         }
 
         // Otherwise, rotate the platform using actions API
         this.actions
-            .rotateBy(-Config.PlatformHidingAngle, Config.PlatformHidingAngle / (time / 1000))
+            .rotateTo(-Config.PlatformHidingAngle, Config.PlatformHidingAngle / (time / 1000))
             .callMethod(() => {
                 // TODO: Replace this sound
                 // void Resources.Falling.play();
@@ -273,13 +428,18 @@ export class PlatformUnit extends Actor {
     }
 
     public show(time: number) {
+        console.log(this.name, 'show');
+
         // Make platform stop and don't collide
         this.isStopped = true;
         this.body.collisionType = CollisionType.PreventCollision;
+        this.rotation = Config.PlatformHidingAngle;
 
         // Check if show immediately
         if (time === 0) {
             this.rotation = 0;
+            this.isStopped = false;
+            this.body.collisionType = CollisionType.Fixed;
             return;
         }
 
@@ -289,11 +449,11 @@ export class PlatformUnit extends Actor {
                 // TODO: Replace this sound
                 // void Resources.Falling.play();
             })
-            .rotateBy(-Config.PlatformHidingAngle, Config.PlatformHidingAngle / (time / 1000))
+            .rotateTo(0, Config.PlatformHidingAngle / (time / 1000))
             .callMethod(() => {
                 // Make platform move and collide again
                 this.isStopped = false;
-                this.body.collisionType = this.data.collisionType;
+                this.body.collisionType = CollisionType.Fixed;
             });
     }
 
@@ -321,10 +481,15 @@ export class Platform extends Actor {
             y: pos.y,
         });
 
-        // Add children
-        const children = PLATFORM_PATTERNS[this.pattern](this.level);
+        //
+        // I'm required to add children in the constructor since they can be queried
+        // before the actor is initialized.
+        //
+        // (e.g. in the `fillLevel` method, calling `this.show`).
+        //
+        const children = PLATFORM_PATTERNS[this.pattern];
         for (const data of children) {
-            this.addChild(new PlatformUnit(this.pattern, data));
+            this.addChild(new PlatformUnit(this.pattern, data, this.level));
         }
     }
 
