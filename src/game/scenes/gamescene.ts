@@ -11,27 +11,26 @@ export class GameScene extends Scene {
 
     private player: Player;
     private environment: Environment;
-    private score = 0;
     private level = 0;
-
-    private wasClose = false;
-    private timerunning = 0;
-    private timelimit = Config.TimeLimitBase;
-    private scoretimer: Timer;
     private platforms: Platform[] = [];
+    private score = 0;
+    private scoreTimer: Timer;
+    private timeRunning = 0;
+    private timeLimit = Config.TimeLimitBase;
+    private wasClose = false;
 
     onInitialize(engine: Engine) {
         Ui.UpdateScore(this.score);
-        Ui.UpdateTime(this.timerunning, false);
-        Ui.UpdateTimeLimit(this.timelimit / 1000);
+        Ui.UpdateTime(this.timeRunning, false);
+        Ui.UpdateTimeLimit(this.timeLimit / 1000);
 
         // Add score timer
-        this.scoretimer = new Timer({
+        this.scoreTimer = new Timer({
             fcn: this.updateScore.bind(this),
             repeats: true,
             interval: Config.ScoreTimerInterval,
         });
-        this.add(this.scoretimer);
+        this.add(this.scoreTimer);
 
         // Add environment
         this.environment = new Environment();
@@ -50,7 +49,7 @@ export class GameScene extends Scene {
 
     private onDie() {
         // Stop the timer
-        this.scoretimer.stop();
+        this.scoreTimer.stop();
         this.player.isPaused = true;
 
         // Zoom in the camera over 1 second
@@ -71,14 +70,14 @@ export class GameScene extends Scene {
 
     private onWin() {
         // Stop the timer
-        this.scoretimer.stop();
+        this.scoreTimer.stop();
         this.player.isPaused = true;
 
         // Play win sound
         void Resources.music.LevelComplete.play(Config.volume);
 
         // Stop the timer
-        this.score += (this.timelimit - this.timerunning) * (this.level + 1);
+        this.score += (this.timeLimit - this.timeRunning) * (this.level + 1);
         Ui.UpdateScore(this.score);
         Leaderboard.SubmitScore(this.score)
             .then(() => {
@@ -117,12 +116,12 @@ export class GameScene extends Scene {
 
     private startScene() {
         this.wasClose = false;
-        this.timerunning = 0;
-        this.timelimit = Math.max(Config.TimeLimitBaseMin, Config.TimeLimitBase + Config.TimeLimitIncrease * this.level);
-        Ui.UpdateTimeLimit(this.timelimit / 1000);
+        this.timeRunning = 0;
+        this.timeLimit = Math.max(Config.TimeLimitBaseMin, Config.TimeLimitBase + Config.TimeLimitIncrease * this.level);
+        Ui.UpdateTimeLimit(this.timeLimit / 1000);
         this.player.isPaused = false;
-        this.scoretimer.reset();
-        this.scoretimer.start();
+        this.scoreTimer.reset();
+        this.scoreTimer.start();
     }
 
     private animateLevelComplete() {
@@ -200,11 +199,11 @@ export class GameScene extends Scene {
 
     private updateScore() {
         // Update time
-        this.timerunning += Config.ScoreTimerInterval;
+        this.timeRunning += Config.ScoreTimerInterval;
 
         // Update UI
-        const close = this.timerunning >= (this.timelimit * Config.TimeThresholdForClose);
-        Ui.UpdateTime(this.timerunning / 1000, close);
+        const close = this.timeRunning >= (this.timeLimit * Config.TimeThresholdForClose);
+        Ui.UpdateTime(this.timeRunning / 1000, close);
 
         // Play danger sound (once)
         if (close && !this.wasClose) {
@@ -213,7 +212,7 @@ export class GameScene extends Scene {
         }
 
         // Check if time is up
-        if (this.timerunning >= this.timelimit) {
+        if (this.timeRunning >= this.timeLimit) {
             this.player.die();
         }
     }
