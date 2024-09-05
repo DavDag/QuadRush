@@ -29,7 +29,7 @@ export const Config = {
     CameraZoomOnDeath: 2,
 
     // Game: Gameplay
-    SideSpeed: 200,
+    SideSpeed: 250,
     JumpSpeed: 450,
     DashPower: 2,
     DashDuration: 500,
