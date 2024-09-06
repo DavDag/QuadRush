@@ -15,11 +15,11 @@ export const Ui = {
         document.getElementById('score').innerText = score.toString();
         document.getElementById('game-over-score').innerText = score.toString();
     },
-    UpdateHighScore(highScore: number | string, rank: number | string) {
-        document.getElementById('high-score').innerText = `${highScore}`;
-        document.getElementById('rank').innerText = (typeof rank === 'number') ? `#${rank}` : rank;
-        document.getElementById('game-over-highscore').innerText = `${highScore}`;
-        document.getElementById('game-over-currentrank').innerText = (typeof rank === 'number') ? `#${rank}` : rank;
+    UpdateHighScore(highScore: number, rank: number) {
+        document.getElementById('high-score').innerText = (highScore === 0) ? '-' : highScore.toString();
+        document.getElementById('rank').innerText = (rank === 0) ? '-' : '#' + rank.toString();
+        document.getElementById('game-over-highscore').innerText = (highScore === 0) ? '-' : highScore.toString();
+        document.getElementById('game-over-currentrank').innerText = (rank === 0) ? '-' : '#' + rank.toString();
     },
     UpdateTime(time: number, close: boolean) {
         // Format time as MM:SS:MS
