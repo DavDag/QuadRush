@@ -14,7 +14,6 @@ import {
 } from "excalibur";
 import {Config} from "../config";
 import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
-import {PlatformUnit} from "./platform";
 
 export class Player extends Actor {
 

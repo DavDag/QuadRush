@@ -458,8 +458,6 @@ export class PlatformUnit extends Actor {
     }
 
     public show(time: number) {
-        console.log(this.name, 'show');
-
         // Make platform stop and don't collide
         this.isStopped = true;
         this.body.collisionType = CollisionType.PreventCollision;

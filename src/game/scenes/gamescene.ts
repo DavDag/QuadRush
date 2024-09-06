@@ -40,6 +40,7 @@ export class GameScene extends Scene {
         this.player = new Player(this.onDie.bind(this), this.onWin.bind(this));
         this.player.pos = new Vector(-Config.LevelLength / 2 + 200, Config.PlatformHeight - 200);
         this.add(this.player);
+        this.camera.pos = this.player.pos;
         this.camera.strategy.elasticToActor(this.player, 0.1, 0.1);
 
         // Add platforms for level

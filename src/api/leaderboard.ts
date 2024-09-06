@@ -1,6 +1,7 @@
 import {Ui} from "../ui";
 
 const token = 'dev_7c18eecf877e40839a54bc7dc74ce363'; // Game key from LootLocker.io
+const leaderboardId = 24364; // Leaderboard ID from LootLocker.io
 
 // Leaderboard APIs
 const APIs = (pid: string) => ({
@@ -16,17 +17,17 @@ const APIs = (pid: string) => ({
                 player_identifier: pid
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            sessionStorage.setItem('session_token', data.session_token);
-            sessionStorage.setItem('player_id', data.player_id);
-            localStorage.setItem('player_identifier', data.player_identifier);
-            console.debug('LogInPlayer:', data);
-            return data;
-        });
+            .then(response => response.json())
+            .then(data => {
+                sessionStorage.setItem('session_token', data.session_token);
+                sessionStorage.setItem('player_id', data.player_id);
+                localStorage.setItem('player_identifier', data.player_identifier);
+                console.debug('LogInPlayer:', data);
+                return data;
+            });
     },
     SubmitScore: async (score: number) => {
-        return await fetch('https://api.lootlocker.io/game/leaderboards/24364/submit', {
+        return await fetch(`https://api.lootlocker.io/game/leaderboards/${leaderboardId}/submit`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -36,25 +37,39 @@ const APIs = (pid: string) => ({
                 score: score
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            console.debug('SubmitScore:', data);
-            return data;
-        });
+            .then(response => response.json())
+            .then(data => {
+                console.debug('SubmitScore:', data);
+                return data;
+            });
     },
     GetHighScore: async () => {
-        return await fetch('https://api.lootlocker.io/game/leaderboards/24364/member/' + sessionStorage.getItem('player_id'), {
+        return await fetch(`https://api.lootlocker.io/game/leaderboards/${leaderboardId}/member/${sessionStorage.getItem('player_id')}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'x-session-token': sessionStorage.getItem('session_token')
             },
         })
-        .then(response => response.json())
-        .then(data => {
-            console.debug('GetHighScore:', data);
-            return data;
-        });
+            .then(response => response.json())
+            .then(data => {
+                console.debug('GetHighScore:', data);
+                return data;
+            });
+    },
+    GetLeaderboard: async (count: number = 50) => {
+        return await fetch(`https://api.lootlocker.io/game/leaderboards/${leaderboardId}/list?count=${count}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-session-token': sessionStorage.getItem('session_token')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.debug('GetLeaderboard:', data);
+                return data;
+            });
     }
 });
 
