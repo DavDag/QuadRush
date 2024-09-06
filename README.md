@@ -7,13 +7,10 @@
 <a href="https://itch.io/jam/scorejam31">
   <img src="https://scorespace.net/wp-content/uploads/2021/12/SS_LOGO_MAIN-mobile.png" width="50px" alt="scorespace.net" />
 </a>
-
-<a href="https://progetti-strani.github.io/TheFloorIsLava/">
-  <img src="https://github.com/user-attachments/assets/865cf62a-7d87-478d-8a61-1b796e26b168" width="33px" alt="play" />
-</a>
 <br>
 
-Submission to the _ScoreSpam GameJam #31_.
+Submission to the _ScoreSpam GameJam #31_.<br>
+Play it online [here](https://progetti-strani.github.io/TheFloorIsLava/).
 
 ## Gameplay
 
