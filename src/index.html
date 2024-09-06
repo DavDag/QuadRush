@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuadRush</title>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0"/>
+    <script src="index.ts" type="module"></script>
     <style>
         html, body {
             margin: 0;
@@ -21,6 +24,26 @@
             align-items: center;
         }
 
+        button {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px;
+        }
+
+        button:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .icon-button {
+            padding: 0;
+        }
+
+        .material-symbols-outlined {
+            vertical-align: middle;
+        }
+
         .game-container {
             position: relative;
             width: 800px !important;
@@ -30,21 +53,6 @@
         .game-container canvas {
             width: 100%;
             height: 100%;
-        }
-
-        .game-menu-overlay {
-            position: absolute;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-
-            backdrop-filter: blur(5px);
         }
 
         .game-overlay {
@@ -66,44 +74,165 @@
             border-radius: 5px;
         }
 
-        .game-overlay div span {
+        .game-overlay div #rank, #high-score, #score, #time, #timelimit {
             font-weight: bold;
             flex-grow: 1;
-            text-align: center;
+            text-align: end;
+        }
+
+        #rank-section {
+            width: 100px;
+            flex-grow: 0 !important;
         }
 
         #time-section {
-            width: 200px;
+            width: 165px;
             flex-grow: 0 !important;
         }
 
         .close {
             color: tomato;
         }
+
+        .game-menu-overlay {
+            position: absolute;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            overflow: hidden;
+            color: white;
+            backdrop-filter: blur(5px);
+        }
+        .game-menu-overlay h1 {
+            text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-over-value {
+            display: flex;
+            width: 200px;
+            margin: 0 0 8px 0;
+        }
+
+        #game-over-score, #game-over-highscore, #game-over-currentrank {
+            flex-grow: 1;
+            text-align: end;
+        }
+
+        #leaderboard-overlay {
+            width: 30%;
+            height: calc(100% - 16px);
+            margin: 8px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+        }
+
+        #leaderboard-header {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        #leaderboard-header .leaderboard-header-title {
+            margin: 0;
+            padding: 8px;
+        }
+
+        #leaderboard-header .leaderboard-header-refresh {
+            margin: 8px;
+            padding: 0;
+        }
+
+        #leaderboard-content {
+            width: 100%;
+            flex-grow: 1;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.5) transparent;
+            padding: 0;
+            margin: 0;
+        }
+
+        #leaderboard-content table {
+            width: 100%;
+            min-height: 100%;
+            border-collapse: collapse;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        #leaderboard-content-thead {
+            width: 100%;
+            text-align: end;
+            position: sticky;
+            top: 2px;
+            z-index: 1;
+            background-color: #101010;
+        }
+
+        #leaderboard-content-tbody {
+            text-align: end;
+        }
+
+        #leaderboard-content table th, #leaderboard-content table td {
+            border-bottom: 1px solid black;
+        }
     </style>
 </head>
 <body>
-    <script src="index.ts" type="module"></script>
-    <div class="game-container">
-        <canvas id="game"></canvas>
+<div class="game-container">
+    <canvas id="game"></canvas>
 
-        <div id="ui-overlay" class="game-overlay">
-            <div>Rank<span id="rank">0</span></div>
-            <div>HighScore<span id="high-score">0</span></div>
-            <div>Score<span id="score">0</span></div>
-            <div id="time-section">Time<span id="time">0</span>of<span id="timelimit">0</span></div>
-        </div>
-
-        <div id="game-over" class="game-menu-overlay">
-            <h1>Game Over</h1>
-            <p>Score: <span id="game-over-score">0</span></p>
-            <button onclick="window.PlayAgain();">Play Again</button>
-        </div>
-
-        <div id="pause-overlay" class="game-menu-overlay">
-            <h1>Pause</h1>
-            <button onclick="window.ResumeGame();">Resume</button>
+    <div id="ui-overlay" class="game-overlay">
+        <div id="rank-section">Rank<span id="rank">-</span></div>
+        <div>HighScore<span id="high-score">-</span></div>
+        <div>Score<span id="score">-</span></div>
+        <div id="time-section">
+            Time<span id="time">-</span>
+            <span style="margin-left: 4px;">/</span>
+            <span id="timelimit">-</span>
         </div>
     </div>
+
+    <div id="game-over" class="game-menu-overlay">
+        <h1>Game Over</h1>
+        <span class="game-over-value">Score: <span id="game-over-score">-</span></span>
+        <span class="game-over-value">HighScore: <span id="game-over-highscore">-</span></span>
+        <span class="game-over-value">Current Rank: <span id="game-over-currentrank">-</span></span>
+        <button onclick="window.PlayAgain();">Play Again</button>
+    </div>
+
+    <div id="pause-overlay" class="game-menu-overlay">
+        <h1>Pause</h1>
+        <button onclick="window.ResumeGame();">Resume</button>
+    </div>
+
+    <div id="leaderboard-overlay" class="game-menu-overlay">
+        <div id="leaderboard-header">
+            <h2 class="leaderboard-header-title">Leaderboard</h2>
+            <button class="leaderboard-header-refresh icon-button" onclick="window.UpdateLeaderboard();">
+                <span class="material-symbols-outlined">sync</span>
+            </button>
+        </div>
+        <div id="leaderboard-content">
+            <table>
+                <thead id="leaderboard-content-thead">
+                <tr>
+                    <th style="width: 50px;">Rank</th>
+                    <th>Score</th>
+                </tr>
+                </thead>
+                <tbody id="leaderboard-content-tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 </body>
 </html>

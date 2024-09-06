@@ -1,12 +1,23 @@
 import {Resources} from "./resources";
-import {Actor, Collider, CollisionContact, CollisionType, Color, Engine, Keys, Side, Vector} from "excalibur";
+import {
+    Actor,
+    Collider,
+    CollisionContact,
+    CollisionType,
+    Color,
+    Engine,
+    Keys,
+    Shape,
+    Side,
+    Sprite,
+    Vector
+} from "excalibur";
 import {Config} from "../config";
+import {MakeThisASceneryObject} from "./graphics/make-scenery-obj";
 
 export class Player extends Actor {
 
-    public isPaused = true;
-    private hasWon = false;
-    private isDead = false;
+    public isPaused = false;
     private onGround = false;
     private hasDash = false;
     private isDashing = 0;
@@ -14,17 +25,40 @@ export class Player extends Actor {
     constructor(private OnDie: () => void, private OnWin: () => void) {
         super({
             name: 'player',
-            width: 50,
-            height: 50,
-            color: Color.Blue,
-            collisionType: CollisionType.Active
+            width: Config.PlayerWidth,
+            height: Config.PlayerHeight,
+            color: Color.Violet,
+            collisionType: CollisionType.Active,
+            collider: Shape.Box(50, 50),
         });
     }
 
-    onPreUpdate(engine: Engine, delta: number) {
-        if (this.isDead || this.hasWon || this.isPaused) return;
+    onInitialize(engine: Engine) {
+        // Add player sprite
+        const sprite = new Sprite({
+            image: Resources.image.PaperTexture,
+            sourceView: {
+                x: Math.random() * 1000,
+                y: Math.random() * 1000,
+                width: this.width,
+                height: this.height,
+            },
+            destSize: {
+                width: this.width,
+                height: this.height,
+            },
+            tint: Config.PlayerColor,
+        });
+        this.graphics.use(sprite);
 
-        // Apply gravity
+        // Make player a scenery object
+        MakeThisASceneryObject(this, Config.PlayerZIndex, true, true);
+    }
+
+    onPreUpdate(engine: Engine, delta: number) {
+        if (this.isPaused) return;
+
+        // Apply Gravity
         this.vel.y += 800 * delta / 1000.0;
 
         // Reduce dash duration
@@ -34,6 +68,8 @@ export class Player extends Actor {
                 this.isDashing = 0;
             }
         }
+
+        // Check to reset dash
         if (this.isDashing <= 0 && this.onGround) {
             this.hasDash = true;
         }
@@ -44,13 +80,13 @@ export class Player extends Actor {
             if (this.isDashing > 0 && this.vel.x > 0) {
                 this.isDashing = 0;
             }
-            this.vel.x = -Config.sideSpeed * (this.isDashing > 0 ? Config.dashPower : 1);
+            this.vel.x = -Config.SideSpeed * (this.isDashing > 0 ? Config.DashPower : 1);
         } else if (engine.input.keyboard.isHeld(Keys.Right)
             || engine.input.keyboard.isHeld(Keys.D)) {
             if (this.isDashing > 0 && this.vel.x < 0) {
                 this.isDashing = 0;
             }
-            this.vel.x = Config.sideSpeed * (this.isDashing > 0 ? Config.dashPower : 1);
+            this.vel.x = Config.SideSpeed * (this.isDashing > 0 ? Config.DashPower : 1);
         } else {
             this.vel.x = 0;
         }
@@ -60,49 +96,47 @@ export class Player extends Actor {
                 || engine.input.keyboard.isHeld(Keys.W)
                 || engine.input.keyboard.isHeld(Keys.Space))
             && this.onGround) {
-            this.vel.y = -Config.jumpSpeed;
+            this.vel.y = -Config.JumpSpeed;
             this.onGround = false;
 
-            // Play jump sound
-            void Resources.jump.play(Config.volume);
+            // Play Jump sound
+            void Resources.music.Jump.play(Config.volume);
         }
 
         // Dash
         if (engine.input.keyboard.isHeld(Keys.ShiftLeft)
             && this.hasDash) {
-            this.isDashing = Config.dashDuration;
+            this.isDashing = Config.DashDuration;
             this.hasDash = false;
 
-            // Play dash sound
-            void Resources.dash.play(Config.volume);
+            // Play Dash sound
+            void Resources.music.Dash.play(Config.volume);
         }
     }
 
     onCollisionStart(self: Collider, other: Collider, side: Side, contact: CollisionContact) {
-        if (this.isDead || this.hasWon || this.isPaused) return;
+        if (this.isPaused) return;
 
         // Check for collision with end platform (winning condition)
-        if (other.owner.name === 'platform' && other.owner["pattern"] === 'end') {
-            this.hasWon = true;
+        if (other.owner.name === 'portal.end') {
             this.isPaused = true;
             this.vel = new Vector(0, 0);
             this.OnWin();
         }
 
         // Check for collision with lava (losing condition)
-        if (other.owner.name === 'lava') {
+        if (other.owner.name === 'lava.container') {
             this.die();
             return;
         }
 
         // Check for collision with ground (reset jumping ability)
-        if (side === Side.Bottom) {
+        if (other.owner.name === 'platform' && side === Side.Bottom) {
             this.onGround = true;
         }
     }
 
     public die() {
-        this.isDead = true;
         this.isPaused = true;
         this.vel = new Vector(0, 0);
         this.OnDie();

@@ -8,13 +8,18 @@ export const Ui = {
     SetGameOverOverlayVisibility(visible: boolean) {
         document.getElementById('game-over').style.display = visible ? 'flex' : 'none';
     },
+    SetLeaderboardOverlayVisibility(visible: boolean) {
+        document.getElementById('leaderboard-overlay').style.display = visible ? 'flex' : 'none';
+    },
     UpdateScore(score: number) {
         document.getElementById('score').innerText = score.toString();
         document.getElementById('game-over-score').innerText = score.toString();
     },
     UpdateHighScore(highScore: number, rank: number) {
-        document.getElementById('high-score').innerText = highScore.toString();
-        document.getElementById('rank').innerText = rank.toString();
+        document.getElementById('high-score').innerText = (highScore === 0) ? '-' : highScore.toString();
+        document.getElementById('rank').innerText = (rank === 0) ? '-' : '#' + rank.toString();
+        document.getElementById('game-over-highscore').innerText = (highScore === 0) ? '-' : highScore.toString();
+        document.getElementById('game-over-currentrank').innerText = (rank === 0) ? '-' : '#' + rank.toString();
     },
     UpdateTime(time: number, close: boolean) {
         // Format time as MM:SS:MS
@@ -36,5 +41,20 @@ export const Ui = {
 
         // Update time display
         document.getElementById('timelimit').innerText = `${minutes}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
+    },
+    UpdateLeaderboard(leaderboard: any[]) {
+        const table = document.getElementById('leaderboard-content-tbody') as HTMLTableSectionElement;
+
+        // Clear existing rows
+        table.innerHTML = '';
+
+        // Add new rows
+        leaderboard.forEach((entry, i) => {
+            const row = table.insertRow();
+            row.innerHTML = `
+                <td>#${entry.rank}</td>
+                <td>${entry.score}</td>
+            `;
+        });
     }
 };
