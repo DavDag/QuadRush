@@ -14,6 +14,10 @@ Play it online [here](https://progetti-strani.github.io/TheFloorIsLava/).
 
 ## Gameplay
 
+TODO: add new gameplay video
+
+> [!WARNING]
+> Older version
 https://github.com/user-attachments/assets/51943e4d-cbec-40f1-980d-074badd1c41b
 
 ## Score equation
